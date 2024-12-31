@@ -2201,7 +2201,7 @@ if __name__ == '__main__':
   parser.add_argument('-s', '--sequencer_class', required=False, default='illumina', help='Sequencing machine class (not required string: \'illumina\' or \'ultima\'. Default: illumina')
   parser.add_argument('-r', '--run_dir', required=False, default=None, help='Illumina run directory path (optional string).')
   parser.add_argument('-l', '--level', type=int, required=False, choices=[ 2, 3 ], default=3, help='Two or three level sci-ATAC-seq experiment (default: %(default)s) (optional integer).')
-  parser.add_argument('-n', '--number_lanes', type=int, required=True, default=None, help='Number of flowcell lanes (required integer).')
+  parser.add_argument('-n', '--number_lanes', type=int, required=False, default=None, help='Number of flowcell lanes (required integer).')
   parser.add_argument('-e', '--template', required=False, action='store_true', help='Write template samplesheet file (\'samplesheet.template.csv\') with standard column formats and exit (optional flag).')
   parser.add_argument('-d', '--documentation', required=False, action='store_true', help='Display documentation and exit (optional flag).')
   parser.add_argument('-v', '--version', required=False, action='store_true', help='Give program and JSON output file versions and exit (optional flag).')
