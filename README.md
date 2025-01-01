@@ -2,15 +2,15 @@
 
 ## Intro
 
-This bbi-scirna-demux pipeline runs the Illumina *bcl-convert* program to make *.bam* files that are demultiplexed by PCR primer pairs, followed by the *rna-rtlig-demux* program to make sample-specific pcr primer pair *.bam* files.
+This bbi-scirna-demux pipeline runs the Illumina *bcl-convert* program to make *.bam* files that are demultiplexed by PCR primer pairs, followed by the *rna_rtlig_demux* program to make sample-specific pcr primer pair *.bam* files.
 
 ## Installation
 
 Install the following software
 
 - Nextflow: this pipeline uses Nextflow DSL2 so you must install a recent version of Nextflow. I use version 24.10.2 successfully. If you need to run the *bbi-dmux* and *bbi-sci* pipelines too, install the new Nextflow in a different location because the recent versions no longer support DSL1.
-- Rust: the *rna-rtlig-demux* program is written in Rust so you must install the Rust compiler.
-- rna-rtlig-demux: this program is a compiled program written in Rust so you must compile it and copy the executable to the *bbi-scirna-demux/bin* directory.
+- Rust: the *rna_rtlig_demux* program is written in Rust so you must install the Rust compiler.
+- rna_rtlig_demux: this program is a compiled program written in Rust so you must compile it and copy the executable to the *bbi-scirna-demux/bin* directory.
 - python3 interpreter: I use version 3.12.1 successfully.
 
 ### Install Nextflow
@@ -25,17 +25,17 @@ See the Rust installation instructions at
 
 https://www.rust-lang.org/tools/install
 
-### Build and install *rna-rtlig-demux*
+### Build and install *rna_rtlig_demux*
 
 Run the following commands
 
 ```
-cd bb-scirna-demux/src/rna-rtlig-demux
+cd bb-scirna-demux/src/rna_rtlig_demux
 cargo build --release
-cp target/release/rna-rtlig-demux ../../../../bin
+cp target/release/rna_rtlig_demux ../../bin
 ```
 
-I recommend that you build *rna-rtlig-demux* on a newer cluster node, for example, s020 on the Shendure cluster.
+I recommend that you build *rna_rtlig_demux* on a newer cluster node, for example, s020 on the Shendure cluster.
 
 ### Load Python3 on the Genome Sciences cluster
 
