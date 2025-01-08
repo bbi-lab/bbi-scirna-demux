@@ -703,13 +703,13 @@ fn open_fastq_writers(sample_index_to_name_map: &Vec<String>,
 
   if(uncompress_flag == true) {
     for i in 0..(sample_index_to_name_map.len()) {
-      let filename: String = format!("{}-{:03}_{:03}_{:03}-R1.fastq", sample_index_to_name_map[i], &file_indices["lane"], &file_indices["p7"], &file_indices["p5"]);
+      let filename: String = format!("{}-{:03}_{:03}_{:03}-L{:03}-R1.fastq", sample_index_to_name_map[i], &file_indices["lane"], &file_indices["p7"], &file_indices["p5"], &file_indices["lane"]);
       println!("index r1: {}  filename: {}", i, filename);
       let writer = open_writer_file(&filename).unwrap();
       let bufwriter = BufWriter::new(writer);
       fastq_out_vec[0].push(bio::io::fastq::Writer::from_bufwriter(bufwriter));
 
-      let filename: String = format!("{}-{:03}_{:03}_{:03}-R2.fastq", sample_index_to_name_map[i], &file_indices["lane"], &file_indices["p7"], &file_indices["p5"]);
+      let filename: String = format!("{}-{:03}_{:03}_{:03}-L{:03}-R2.fastq", sample_index_to_name_map[i], &file_indices["lane"], &file_indices["p7"], &file_indices["p5"], &file_indices["lane"]);
       println!("index r2: {}  filename: {}", i, filename);
       let writer = open_writer_file(&filename).unwrap();
       let bufwriter = BufWriter::new(writer);
@@ -718,13 +718,13 @@ fn open_fastq_writers(sample_index_to_name_map: &Vec<String>,
   }
   else {
     for i in 0..(sample_index_to_name_map.len()) {
-      let filename: String = format!("{}-{:03}_{:03}_{:03}-R1.fastq.gz", sample_index_to_name_map[i], &file_indices["lane"], &file_indices["p7"], &file_indices["p5"]);
+      let filename: String = format!("{}-{:03}_{:03}_{:03}-L{:03}-R1.fastq.gz", sample_index_to_name_map[i], &file_indices["lane"], &file_indices["p7"], &file_indices["p5"], &file_indices["lane"]);
       println!("index r1: {}  filename: {}", i, filename);
       let writer = open_writer_file(&filename).unwrap();
       let bufwriter = BufWriter::new(writer);
       fastq_out_vec[0].push(bio::io::fastq::Writer::from_bufwriter(bufwriter));
 
-      let filename: String = format!("{}-{:03}_{:03}_{:03}-R2.fastq.gz", sample_index_to_name_map[i], &file_indices["lane"], &file_indices["p7"], &file_indices["p5"]);
+      let filename: String = format!("{}-{:03}_{:03}_{:03}-L{:03}-R2.fastq.gz", sample_index_to_name_map[i], &file_indices["lane"], &file_indices["p7"], &file_indices["p5"], &file_indices["lane"]);
       let writer = open_writer_file(&filename).unwrap();
       let bufwriter = BufWriter::new(writer);
       fastq_out_vec[1].push(bio::io::fastq::Writer::from_bufwriter(bufwriter));
@@ -765,7 +765,7 @@ fn open_bam_writers(sample_index_to_name_map: &Vec<String>,
   let date = chrono::offset::Local::now();
 
   for i in 0..(sample_index_to_name_map.len()) {
-      let filename: String = format!("{}-{:03}_{:03}_{:03}.bam", sample_index_to_name_map[i], &file_indices["lane"], &file_indices["p7"], &file_indices["p5"]);
+      let filename: String = format!("{}-{:03}_{:03}_{:03}-L{:03}.bam", sample_index_to_name_map[i], &file_indices["lane"], &file_indices["p7"], &file_indices["p5"], &file_indices["lane"]);
       let mut header = rust_htslib::bam::Header::new();
       header.push_comment(b"Made by rt_lig_demux");
       header.push_comment(format!("rt_lig_demux run date: {}", date.to_string()).as_bytes());
@@ -826,8 +826,6 @@ fn process_reads(fastq1_file: &str,
   let p7_index_encoded = index_encoder[file_indices["p7"]].clone();
   let p5_index_encoded = index_encoder[file_indices["p5"]].clone();
 
-  let lane = file_indices["lane"];
-
 /*
   println!("p7 well: {}", p7_well_name);
   println!("p5 well: {}", p5_well_name);
@@ -875,6 +873,8 @@ fn process_reads(fastq1_file: &str,
   let mut lig_10_slice: std::ops::Range<usize> = 0..0;
   let mut umi_10_slice: std::ops::Range<usize> = 0..0;
   let mut rt_10_slice: std::ops::Range<usize> = 0..0;
+
+  let mut qual_bam: Vec<u8> = Vec::with_capacity(1024);
 
   if(recipe == "std_1") {
     lig_9_slice = 0..9;
@@ -1070,10 +1070,9 @@ fn process_reads(fastq1_file: &str,
     let sample_name: String     = String::from(sample_index_to_name_map[sample_index].clone());
     let umi_seq_string: String  = std::str::from_utf8(umi_seq).unwrap().to_string();
     records_written_index += 1;
-    let read_out_header: String = format!("{}-P5{}-P7{}_{}_{}|{}|{}|{}|{}_{}|{}", sample_name,
+    let read_out_header: String = format!("{}-P5{}-P7{}_{}|{}|{}|{}|{}_{}|{}", sample_name,
                                                                                p5_well_name,
                                                                                p7_well_name,
-                                                                               lane,
                                                                                records_written_index,
                                                                                sample_name,
                                                                                p5_well_name,
@@ -1116,10 +1115,20 @@ fn process_reads(fastq1_file: &str,
       let umi_seq: String = format!("{}", std::str::from_utf8(umi_seq).unwrap().to_string());
 
       let mut record: rust_htslib::bam::Record = rust_htslib::bam::Record::new();
+
+      /*
+      ** The BAM record quality values have no offset so subtract
+      ** the offset from the input fastq quality values.
+      */
+      qual_bam.clear();
+      for i in (0..fastq_record2.qual().len()) {
+        qual_bam.push(fastq_record2.qual()[i] - 33);
+      }
+
       record.set(read_out_header.as_bytes(),
                  None,
                  fastq_record2.seq(),
-                 fastq_record2.qual());
+                 &qual_bam);
       record.push_aux("sS".as_bytes(), rust_htslib::bam::record::Aux::String(&barcode_umi_seq));
       record.push_aux("sQ".as_bytes(), rust_htslib::bam::record::Aux::String("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC"));
       bam_writer_vec[sample_index].write(&record);
@@ -1462,7 +1471,7 @@ fn main() {
   /*
   ** Write log file.
   */
-  let log_file_name: String = String::from(format!("rna_rtlig_demux_log.{:03}_{:03}_{:03}.json", file_indices["lane"], file_indices["p7"], file_indices["p5"]));
+  let log_file_name: String = String::from(format!("rna_rtlig_demux_log.{}_{}_{}.json", file_indices["lane"], file_indices["p7"], file_indices["p5"]));
   write_log_file(&rt_barcode_id_map,
                  &log_read_counts,
                  &well_index_to_sample_index_map,
