@@ -6,6 +6,13 @@
 #
 # Reads SampleSheet.csv and writes to stdout.
 #
+# Notes:
+#   o  this program is intended to convert a well-oriented samplesheet
+#      file to a sample-oriented file. That is, one line per well becomes
+#      one line per sample.
+#   o  however, it works only when the rows for each sample are in blocks.
+#      This should be fixed for consistency.
+#
 
 import io
 import sys

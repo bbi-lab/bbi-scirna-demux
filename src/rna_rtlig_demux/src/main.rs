@@ -1,6 +1,6 @@
 #![allow(unused_parens)]
 #![allow(unused_variables)]
-#![allow(warnings)] 
+//#![allow(warnings)] 
 
 #[global_allocator]
 static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
@@ -33,7 +33,6 @@ const MAX_NUM_PLATES: usize = 16;
 **   https://docs.rs/rust-htslib/latest/rust_htslib/bam/struct.Writer.html
 */
 
-use std::io;
 use std::io::Write;
 use std::error::Error;
 use std::collections::HashMap;
@@ -42,13 +41,12 @@ use base_custom::BaseCustom;
 use regex::Regex;
 extern crate clap;
 use clap::{Arg, Command};
-use bio::io::fastq::{Reader, FastqRead, Record, Writer};
+use bio::io::fastq::{FastqRead, Record, Writer};
 use flate2::read::MultiGzDecoder;
 use flate2::write::GzEncoder;
 use std::io::BufReader;
 use std::io::BufWriter;
 use serde::Deserialize;
-use serde::de::DeserializeOwned;
 use serde::Serialize;
 use rna_rtlig_demux::barcode_utils;
 use chrono;
@@ -157,6 +155,7 @@ fn make_well_index_map(max_index: usize, across_row_first: bool, with_plate: boo
 ** Make a HashMap that maps utiter plate well indices
 ** to well names. Well A01 has index 1.
 */
+/*
 fn make_index_well_map(max_index: usize, across_row_first: bool, with_plate: bool) -> Result<HashMap<usize, String>, Box<dyn Error>> {
   let mut index_well_map: HashMap<usize, String> = HashMap::with_capacity(max_index);
   let mut ipl: usize;
@@ -173,7 +172,7 @@ fn make_index_well_map(max_index: usize, across_row_first: bool, with_plate: boo
   }
   Ok(index_well_map)
 }
-
+*/
 
 /// Convert base10 barcode index to a base4 index encoded
 /// as a String with 'A'=0, 'C'=1, 'G'=2, and 'T'=3.
@@ -286,6 +285,7 @@ fn make_index_vec(index_str: &str) -> Result<Vec<usize>, Box<dyn Error>> {
 **      }
 */
 
+#[allow(dead_code)]
 #[derive(Deserialize, Debug, Clone)]
 struct SampleMap {
   sample_id: String,
@@ -344,10 +344,10 @@ fn deserialize_sample_map_vector(samplesheet_json: serde_json::Value) -> Result<
 ** a sample map that contains a ranges string.
 */
 fn get_sample_index_vecs(sample_map: &SampleMap) -> Result<(Vec<usize>, Vec<usize>, Vec<usize>, Vec<usize>), Box<dyn Error>> {
-  let mut lane_index_vec: Vec<usize> = Vec::new();
-  let mut rt_index_vec: Vec<usize> = Vec::new();
-  let mut p7_index_vec: Vec<usize> = Vec::new();
-  let mut p5_index_vec: Vec<usize> = Vec::new();
+  let lane_index_vec: Vec<usize> = Vec::new();
+  let rt_index_vec: Vec<usize> = Vec::new();
+  let p7_index_vec: Vec<usize> = Vec::new();
+  let p5_index_vec: Vec<usize> = Vec::new();
 
   let lane_index_vec = make_index_vec(&sample_map.lanes).unwrap();
 
@@ -408,6 +408,7 @@ fn get_lane_samples(sample_map_vec_all: &Vec<SampleMap>, lane_index: usize, p7_i
 /*
 ** Barcode correction and identifier structure.
 */
+#[allow(dead_code)]
 #[derive(Debug, Clone, Default)]
 struct BarcodeIdentifier {
   sample_index: usize,
@@ -441,9 +442,8 @@ fn make_barcode_id_map(sample_map_vec: &Vec<SampleMap>, barcode_type: &str, defa
   ** Find barcode file path.
   ** Check the samplesheet json file for a file path. If zero length, use default path.
   */
-  let mut file_name = String::new();
-  let mut test_name = String::new();
-  file_name = "".to_string();
+  let mut file_name = "".to_string();
+  let test_name = String::new();
 
   /*
   **  Set barcode file path using either the value in
@@ -479,7 +479,7 @@ fn make_barcode_id_map(sample_map_vec: &Vec<SampleMap>, barcode_type: &str, defa
   /*
   ** Read the barcodes into a HashMap keyed by barcode sequence.
   */
-  let mut barcode_whitelist = rna_rtlig_demux::barcode_utils::read_barcode_file(&file_name).unwrap();
+  let barcode_whitelist = rna_rtlig_demux::barcode_utils::read_barcode_file(&file_name).unwrap();
   let num_barcode: usize = barcode_whitelist.keys().len();
   if(num_barcode > MAX_NUM_PLATES * 96) {
     eprintln!("The number of {} barcodes, {}, exceeds the current available storage", barcode_type, num_barcode);
@@ -508,12 +508,12 @@ fn make_barcode_id_map(sample_map_vec: &Vec<SampleMap>, barcode_type: &str, defa
         let barcode_well = barcode_whitelist[&barcode_corrected].clone();
         let barcode_index = plate_well_index_map_by_row[&barcode_well];
         let read_count: u64 = 0;
-        let mut barcode_identifier = BarcodeIdentifier { sample_index: sample_index,
-                                                         well_index: barcode_index,
-                                                         well_name: barcode_well,
-                                                         corrected_flag: corrected_flag,
-                                                         num_mismatch: num_mismatch as u32,
-                                                         read_count: read_count};
+        let barcode_identifier = BarcodeIdentifier { sample_index: sample_index,
+                                                     well_index: barcode_index,
+                                                     well_name: barcode_well,
+                                                     corrected_flag: corrected_flag,
+                                                     num_mismatch: num_mismatch as u32,
+                                                     read_count: read_count};
         let _ = barcode_id_map.insert(barcode_seq.as_bytes().to_vec(), barcode_identifier);
       }
     }
@@ -530,12 +530,12 @@ fn make_barcode_id_map(sample_map_vec: &Vec<SampleMap>, barcode_type: &str, defa
         */
         let barcode_index = barcode_well.clone()[3..].parse::<usize>().unwrap();
         let read_count: u64 = 0;
-        let mut barcode_identifier = BarcodeIdentifier { sample_index: sample_index,
-                                                         well_index: barcode_index,
-                                                         well_name: barcode_well,
-                                                         corrected_flag: corrected_flag,
-                                                         num_mismatch: num_mismatch as u32,
-                                                         read_count: read_count};
+        let barcode_identifier = BarcodeIdentifier { sample_index: sample_index,
+                                                     well_index: barcode_index,
+                                                     well_name: barcode_well,
+                                                     corrected_flag: corrected_flag,
+                                                     num_mismatch: num_mismatch as u32,
+                                                     read_count: read_count};
         let _ = barcode_id_map.insert(barcode_seq.as_bytes().to_vec(), barcode_identifier);
       }
     }
@@ -579,7 +579,7 @@ fn make_index_maps(sample_map_vec: &Vec<SampleMap>,
     let sample_id = sample_map.sample_id.clone();
     if(!sample_indices_map.contains_key(&sample_id)) {
       let rt_index_vec: Vec<usize> = Vec::new();
-      let mut sample_indices = SampleIndices { sample_name: sample_id.clone(), sample_index: num_sample_indices, rt_indices: rt_index_vec};
+      let sample_indices = SampleIndices { sample_name: sample_id.clone(), sample_index: num_sample_indices, rt_indices: rt_index_vec};
       num_sample_indices += 1;
       let _ = sample_indices_map.insert(sample_id.clone(), sample_indices);
     }
@@ -587,7 +587,7 @@ fn make_index_maps(sample_map_vec: &Vec<SampleMap>,
     /*
     ** Add rt indices.
     */
-    let mut sample_indices = sample_indices_map.get_mut(&sample_id).unwrap();
+    let sample_indices = sample_indices_map.get_mut(&sample_id).unwrap();
     for rt_index in rt_index_vec.into_iter() {
       sample_indices.rt_indices.push(rt_index);
     }
@@ -652,9 +652,9 @@ fn open_reader_file(filename: &str) -> Result<Box<dyn std::io::Read>, Box<dyn Er
   let file_extension = std::path::Path::new(filename)
                                 .extension()
                                 .and_then(std::ffi::OsStr::to_str).unwrap();
-  let mut reader = std::fs::File::open(filename).expect(&format!("Error: unable to open file {}", &filename));
+  let reader = std::fs::File::open(filename).expect(&format!("Error: unable to open file {}", &filename));
   if(file_extension == "gz") {
-     let mut reader_gzdecoder = MultiGzDecoder::new(reader);
+     let reader_gzdecoder = MultiGzDecoder::new(reader);
      Ok(Box::new(reader_gzdecoder))
   }
   else {
@@ -672,9 +672,9 @@ fn open_writer_file(filename: &str) -> Result<Box<dyn std::io::Write>, Box<dyn E
   let file_extension = std::path::Path::new(filename)
                                 .extension()
                                 .and_then(std::ffi::OsStr::to_str).unwrap();
-  let mut writer = std::fs::File::create(filename).unwrap();
+  let writer = std::fs::File::create(filename).unwrap();
   if(file_extension == "gz") {
-     let mut writer_gzencoder = GzEncoder::new(writer, flate2::Compression::new(6));
+     let writer_gzencoder = GzEncoder::new(writer, flate2::Compression::new(6));
      Ok(Box::new(writer_gzencoder))
   }
   else {
@@ -774,7 +774,7 @@ fn open_bam_writers(sample_index_to_name_map: &Vec<String>,
 
   if(num_threads > 1) {
     for i in 0..(sample_index_to_name_map.len()) {
-      bam_out_vec[i].set_threads(4_usize);
+      let _ = bam_out_vec[i].set_threads(4_usize);
     }
   }
 
@@ -918,8 +918,12 @@ fn process_reads(fastq1_file: &str,
       std::process::exit(-1);
     }
 
+/*
     let seq1 = fastq_record1.seq().clone();
     let seq2 = fastq_record2.seq().clone();
+*/
+    let seq1 = fastq_record1.seq();
+    let seq2 = fastq_record2.seq();
 
     /*
     ** 9 base ligation barcode candidate.
@@ -939,34 +943,45 @@ fn process_reads(fastq1_file: &str,
     ** Check for matches to known barcodes with and
     ** without mismatches.
     */
+    #[warn(unused_assignments)]
     let mut sample_index: usize       = 0_usize;
+    #[warn(unused_assignments)]
     let mut rt_well_index: usize      = 0_usize;
+    #[warn(unused_assignments)]
     let mut rt_well_name: String      = String::new();
+    #[warn(unused_assignments)]
     let mut lig_well_name: String     = String::new();
+    #[warn(unused_assignments)]
     let mut rt_index_encoded: String  = String::new();
+    #[warn(unused_assignments)]
     let mut lig_index_encoded: String = String::new();
+    #[warn(unused_assignments)]
     let mut umi_seq: &[u8];
 
     /*
     ** Interior blocks limit scope of mutable borrows.
     */
+    #[warn(unused_assignments)]
     let mut rtlg_9_and_rtlg_10_flag = false;
+    #[warn(unused_assignments)]
     let mut rt_match_9_flag: bool   = false;
+    #[warn(unused_assignments)]
     let mut lig_match_9_flag: bool  = false;
+    #[warn(unused_assignments)]
     let mut rtlg_9_flag: bool       = false;
     {
       let mut rt_match_9_bi: &mut BarcodeIdentifier = &mut Default::default();
-      let mut rt_match_9_option  = rt_barcode_id_map.get_mut(rt_read_9);
+      let rt_match_9_option  = rt_barcode_id_map.get_mut(rt_read_9);
       match rt_match_9_option {
-        Some(mut rt_match_bi) => { rt_match_9_bi    = rt_match_bi;
-                                   rt_match_9_flag  = true;
-                                   count_rt_9      += 1;
-                                   rt_match_9_bi.read_count += 1 },
+        Some(rt_match_bi) => { rt_match_9_bi    = rt_match_bi;
+                               rt_match_9_flag  = true;
+                               count_rt_9      += 1;
+                               rt_match_9_bi.read_count += 1 },
         None => rt_match_9_flag = false,
       }
 
       let mut lig_match_9_bi: &mut BarcodeIdentifier = &mut Default::default();
-      let mut lig_match_9_option  = ligation_barcode_id_map.get_mut(lig_read_9);
+      let lig_match_9_option  = ligation_barcode_id_map.get_mut(lig_read_9);
       match lig_match_9_option {
         Some(lig_match_bi) => { lig_match_9_bi = lig_match_bi;
                                 lig_match_9_flag = true;
@@ -997,17 +1012,17 @@ fn process_reads(fastq1_file: &str,
     let mut rtlg_10_flag: bool      = false;
     {
       let mut rt_match_10_bi: &mut BarcodeIdentifier = &mut Default::default();
-      let mut rt_match_10_option = rt_barcode_id_map.get_mut(rt_read_10);
+      let rt_match_10_option = rt_barcode_id_map.get_mut(rt_read_10);
       match rt_match_10_option {
-        Some(mut rt_match_bi) => { rt_match_10_bi = rt_match_bi;
-                                   rt_match_10_flag = true;
-                                   count_rt_10 += 1;
-                                   rt_match_10_bi.read_count += 1 },
+        Some(rt_match_bi) => { rt_match_10_bi = rt_match_bi;
+                               rt_match_10_flag = true;
+                               count_rt_10 += 1;
+                               rt_match_10_bi.read_count += 1 },
         None => rt_match_10_flag = false,
       }
 
       let mut lig_match_10_bi: &mut BarcodeIdentifier = &mut Default::default();
-      let mut lig_match_10_option = ligation_barcode_id_map.get_mut(lig_read_10);
+      let lig_match_10_option = ligation_barcode_id_map.get_mut(lig_read_10);
       match lig_match_10_option {
         Some(lig_match_bi) => { lig_match_10_bi = lig_match_bi;
                                 lig_match_10_flag = true;
@@ -1090,19 +1105,19 @@ fn process_reads(fastq1_file: &str,
 
     if(output_file_format == "fastq") {
       {
-        let mut writer1 = &mut fastq_writer_vec[0][sample_index];
+        let writer1 = &mut fastq_writer_vec[0][sample_index];
         writer1.write(&read_out_header,
                       None,
                       barcode_umi_seq.as_bytes(),
-                      b"CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC");
+                      b"CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC").expect("Error: unable to write sequence to fastq file.");
       }
 
       {
-        let mut writer2 = &mut fastq_writer_vec[1][sample_index];
+        let writer2 = &mut fastq_writer_vec[1][sample_index];
         writer2.write(&read_out_header, 
                       None,
                       fastq_record2.seq(),
-                      fastq_record2.qual());
+                      fastq_record2.qual()).expect("Error: unable to write quality values to fastq file.");
       }
     }
     else
@@ -1129,9 +1144,9 @@ fn process_reads(fastq1_file: &str,
                  None,
                  fastq_record2.seq(),
                  &qual_bam);
-      record.push_aux("sS".as_bytes(), rust_htslib::bam::record::Aux::String(&barcode_umi_seq));
-      record.push_aux("sQ".as_bytes(), rust_htslib::bam::record::Aux::String("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC"));
-      bam_writer_vec[sample_index].write(&record);
+      record.push_aux("sS".as_bytes(), rust_htslib::bam::record::Aux::String(&barcode_umi_seq)).expect("Error: unable to add barcode sequence to BAM record tags.");
+      record.push_aux("sQ".as_bytes(), rust_htslib::bam::record::Aux::String("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")).expect("Error: unable to add barcode quality values to BAM record tags.");
+      bam_writer_vec[sample_index].write(&record).expect("Error: unable to write record to BAM file.");
     }
 
   } /* loop end */
@@ -1142,7 +1157,7 @@ fn process_reads(fastq1_file: &str,
   if(output_file_format == "fastq") {
     for iread in 0..2 {
       for isample in (0..fastq_writer_vec[0].len()) {
-        fastq_writer_vec[iread][isample].flush();
+        fastq_writer_vec[iread][isample].flush().expect("Error: unable to flush BAM file to disk.");
       }
     }
   }
