@@ -196,6 +196,14 @@ def make_barcode_path_dict(pcr_data_list, default_p7_file, default_p5_file):
 
 
 #
+# Reverse complement sequence 'seq'.
+#
+revcomp = str.maketrans('ACGTacgtRYMKrymkVBHDvbhd', 'TGCAtgcaYRKMyrkmBVDHbvdh')
+def reverse_complement(seq):
+    return seq.translate(revcomp)[::-1]
+
+
+#
 # Make a lane-to-barcode sequence map using a dictionary keyed by the
 # the lane number with dictionary values that are dictionaries keyed
 # by 'p7' and 'p5'. Those have values that are dictionaries keyed by
@@ -204,7 +212,7 @@ def make_barcode_path_dict(pcr_data_list, default_p7_file, default_p5_file):
 #
 #   barcode_seq_dict[lane][(p7|p5)][index] = sequence
 #
-def make_barcode_seq_dict(barcode_path_dict, p7_well_to_index_dict, p5_well_to_index_dict):
+def make_barcode_seq_dict(barcode_path_dict, p7_well_to_index_dict, p5_well_to_index_dict, p5_rcmp):
   barcode_seq_dict = {}
   for lane in barcode_path_dict.keys():
     barcode_seq_dict[lane] = {}
@@ -217,7 +225,10 @@ def make_barcode_seq_dict(barcode_path_dict, p7_well_to_index_dict, p5_well_to_i
     p5_barcodes = read_barcodes(p5_file)
     barcode_seq_dict[lane]['p5'] = {}
     for well in p5_barcodes.keys():
-      barcode_seq_dict[lane]['p5'][p5_well_to_index_dict[well]] = p5_barcodes[well]
+      if(p5_rcmp):
+        barcode_seq_dict[lane]['p5'][p5_well_to_index_dict[well]] = reverse_complement(p5_barcodes[well])
+      else:
+        barcode_seq_dict[lane]['p5'][p5_well_to_index_dict[well]] = p5_barcodes[well]
   return(barcode_seq_dict)
 
 
@@ -315,7 +326,7 @@ def  make_bclconvert_samplesheet(distinct_tuples, p7_index_zero, p5_index_zero, 
 
 ##############################
 ### Diagnostic code only.
-##
+##############################
 
 # Consider filtering output using
 #   grep '^diag' | awk '{print $3, $4, $5, $6, $7, $8}' | sort -k 1,2 -n | uniq
@@ -371,6 +382,7 @@ if __name__ == '__main__':
   parser.add_argument('-o', '--output', required=False, default=None, help='Output bcl-convert samplesheet filename (required string).')
   parser.add_argument('-7', '--p7_file', required=False, default=None, help='P7 barcode file path.')
   parser.add_argument('-5', '--p5_file', required=False, default=None, help='P5 barcode file path.')
+  parser.add_argument('-r', '--p5_rcmp', required=True, default=None, help='P5 reverse complement (bool).')
   parser.add_argument('-v', '--version', required=False, default=None, help='Write version string to stdout.')
   args = parser.parse_args()
 
@@ -401,7 +413,7 @@ if __name__ == '__main__':
   #
   # Make lane-to-barcode sequence dictionary.
   #
-  barcode_seq_dict = make_barcode_seq_dict(barcode_path_dict, p7_well_to_index_dict, p5_well_to_index_dict)
+  barcode_seq_dict = make_barcode_seq_dict(barcode_path_dict, p7_well_to_index_dict, p5_well_to_index_dict, args.p5_rcmp)
 #  print(json.dumps(barcode_seq_dict, indent=2))
 
   #
