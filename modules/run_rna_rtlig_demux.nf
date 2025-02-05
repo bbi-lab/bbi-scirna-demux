@@ -3,6 +3,8 @@ def demux_log = params.output_dir + '/demux_log'
 
 
 process run_rna_rtlig_demux {
+  cache 'lenient'
+
   publishDir path: "${demux_out}", pattern: "*.bam", mode: 'copy'
   publishDir path: "${demux_log}", pattern: "*.json", mode: 'copy'
 

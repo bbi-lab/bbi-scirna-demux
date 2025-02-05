@@ -1,4 +1,5 @@
 process run_bclconvert {
+  cache 'lenient'
 
   input:
     val samplesheet_json
