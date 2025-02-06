@@ -30,7 +30,7 @@ https://www.rust-lang.org/tools/install
 Run the following commands
 
 ```
-cd bb-scirna-demux/src/rna_rtlig_demux
+cd bbi-scirna-demux/src/rna_rtlig_demux
 cargo build --release
 cp target/release/rna_rtlig_demux ../../bin
 ```
