@@ -58,7 +58,7 @@ use chrono;
 fn set_cl_options() -> Result<clap::Command, Box<dyn Error>> {
   let cl_options = Command::new("process_hashes")
         .version(env!("CARGO_PKG_VERSION"))
-        .about("Finds hash sequence reads in fastq file.")
+        .about("Demultiplex fastq files on RT and ligation barcodes.")
         .arg(Arg::new("fastq_read_1")   //required=true, no default
                   .required(true)
                   .short('1')
