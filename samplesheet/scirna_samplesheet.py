@@ -37,7 +37,7 @@ Input (front-end) samplesheet format:
           be distributed. This information is used by the bbi-sciatac-wrap
           script.
        o  lanes
-       o  hash_reads
+       o  hash_file
        o  rt_file: path to custom RT primer barcode file.
        o  ligation_file: path to custom ligation barcode file.
        o  p7_file: path to custom P7 barcode file.
@@ -155,10 +155,9 @@ Input (front-end) samplesheet format:
           examples:
             o  1:3
             o  1,3,5:8
-  o  hash_reads:
-       o  given as either 'y', the sample has hash reads; otherwise
-          the sample does not have hash reads (may be any string other
-          than 'y' including an empty cell). Cells may be empty.
+  o  hash_file:
+       o  path to the hash barcode file for samples with hash reads; leave
+          the cell empty for samples without hash reads.
   o  sample_flags:
        o  sample_flags identify certain sample types, for example, Sentinal
           and Barnyard. The allowed values are 's', 'S', 'b', and 'B'.
@@ -180,10 +179,10 @@ Input (front-end) samplesheet format:
           values.
   Example samplesheet file:
 
-  sample_name,genome,rt_wells,p7_wells,p5_wells,external_sample_name,tissue,wrap_group,hash_reads,lanes,sample_flags
-  sample.1,mouse,"P01-A01:P01-A02","C01:C12","A11:H11",extsample.1,brain,Smith,false,"1:3,5",
-  sample.2,mouse,"P01-A03:P01-A04","C01:C12","A11:H11",extsample.2,brain,Smith,false,"1:4",
-  Barnyard,barnyard,"P01-A05:P01-A06","C01:C12","A11:H11",,barnyard,BBI,false,"1:4",B
+  sample_name,genome,rt_wells,p7_wells,p5_wells,external_sample_name,tissue,wrap_group,hash_file,lanes,sample_flags
+  sample.1,mouse,"P01-A01:P01-A02","C01:C12","A11:H11",extsample.1,brain,Smith,,"1:3,5",
+  sample.2,mouse,"P01-A03:P01-A04","C01:C12","A11:H11",extsample.2,brain,Smith,,"1:4",
+  Barnyard,barnyard,"P01-A05:P01-A06","C01:C12","A11:H11",,barnyard,BBI,,"1:4",B
 
   Notes:
     o  the well value sets are enclosed in quotes in this example because the
@@ -312,18 +311,18 @@ barcode_file_types = [ 'rt_file', 'ligation_file', 'p7_file', 'p5_file' ]
 p5_column_names = 'p5_wells p5_columns'
 p7_column_names = 'p7_wells p7_rows'
 
-column_header_name_list = [ 'rt_wells', 'sample_name', 'genome', 'sample_flags', 'external_sample_name', 'tissue', 'wrap_group', 'lanes', 'hash_reads', 'rt_file', 'ligation_file', 'p7_file', 'p5_file', 'library', 'process_group' ]
+column_header_name_list = [ 'rt_wells', 'sample_name', 'genome', 'sample_flags', 'external_sample_name', 'tissue', 'wrap_group', 'lanes', 'hash_file', 'rt_file', 'ligation_file', 'p7_file', 'p5_file', 'library', 'process_group' ]
 column_header_name_list.extend( p5_column_names.split() )
 column_header_name_list.extend( p7_column_names.split() )
 
 columns_required_list = [ 'rt', 'p5', 'p7', 'sample_name', 'genome' ]
-columns_optional_list = [ 'sample_flags', 'external_sample_name', 'tissue', 'wrap_group', 'lanes', 'hash_reads', 'rt_file', 'ligation_file', 'p7_file', 'p5_file', 'library', 'process_group' ]
+columns_optional_list = [ 'sample_flags', 'external_sample_name', 'tissue', 'wrap_group', 'lanes', 'hash_file', 'rt_file', 'ligation_file', 'p7_file', 'p5_file', 'library', 'process_group' ]
 
 #
 # Columns that may have empty cells. This is used to prevent
 # errors when testing for empty cells in check_rows().
 #
-column_allow_empty_cell = [ 'sample_flags', 'external_sample_name', 'tissue', 'wrap_group', 'hash_reads', 'rt_file', 'ligation_file', 'p7_file', 'p5_file', 'library' ]
+column_allow_empty_cell = [ 'sample_flags', 'external_sample_name', 'tissue', 'wrap_group', 'hash_file', 'rt_file', 'ligation_file', 'p7_file', 'p5_file', 'library' ]
 
 
 #
@@ -453,8 +452,8 @@ def parse_header_column_name( string_in, column_name_list, error_string ):
     column_name_dict = { 'type': 'wrap_group', 'format': None }
   elif( string_in == 'lanes' ):
     column_name_dict = { 'type': 'lanes', 'format': None }
-  elif( string_in == 'hash_reads' ):
-    column_name_dict = { 'type': 'hash_reads', 'format': None }
+  elif( string_in == 'hash_file' ):
+    column_name_dict = { 'type': 'hash_file', 'format': None }
   elif( string_in == 'rt_file' ):
     column_name_dict = { 'type': 'rt_file', 'format': None }
   elif( string_in == 'ligation_file' ):
@@ -525,7 +524,7 @@ def parse_header( row_header ):
   Convert column header (row) into a list of column name dictionaries.
   The dictionary has the elements
     key     value description
-    type    entry type name: rt, p5, p7, sample_name, genome, sample_flags, external_sample_name, tissue, wrap_group, lanes, hash_reads
+    type    entry type name: rt, p5, p7, sample_name, genome, sample_flags, external_sample_name, tissue, wrap_group, lanes, hash_file
     format  barcode format values: wells, None (see column_header_name_list for allowed combinations of type and format)
   """
   column_name_list = []
@@ -1164,23 +1163,21 @@ def check_lanes( column_name_list, samplesheet_row_list ):
   return( 0 )
 
 
-def check_hash_reads( column_name_list, samplesheet_row_list ):
+def check_hash_file( column_name_list, samplesheet_row_list ):
   """ 
-  Check that hash_reads values are valid.
+  Check that hash_file values are valid.
   """
   bad_row_dict = {}
   for irow, row_elements in enumerate(samplesheet_row_list):
     for i in range( len( row_elements ) ):
       column_name_dict = column_name_list[i]
       element_string = row_elements[i]
-      if( column_name_dict['type'] != 'hash_reads' ):
+      if( column_name_dict['type'] != 'hash_file' ):
         continue
       if( len( element_string ) == 0 ):
         continue
-      if( re.search(r'[^a-zA-Z0-9]', element_string ) ):
+      if( not check_path_validity( element_string ) ):
         bad_row_dict.setdefault( irow + 2, element_string )
-      if( element_string != 'y' ):
-        samplesheet_row_list[irow][i] = ''
   if( len( bad_row_dict.keys() ) > 0 ):
     print('Sample hash reads values have invalid characters.' )
     print('  Row\tCell')
@@ -1239,7 +1236,7 @@ def check_barcode_files( column_name_list, samplesheet_row_list ):
 #  counter[<lane_set value>]['sample_name'][<sample_name>]['sample_flags'][<sample_flags>] = <count>
 #  counter[<lane_set value>]['sample_name'][<sample_name>]['tissue'][<tissue>] = <count>
 #  counter[<lane_set value>]['sample_name'][<sample_name>]['wrap_group'][<wrap_group>] = <count>
-#  counter[<lane_set value>]['sample_name'][<sample_name>]['hash_reads'][<hash_reads>] = <count>
+#  counter[<lane_set value>]['sample_name'][<sample_name>]['hash_file'][<hash_file>] = <count>
 #
 def counter_set_value(counter_dict, row_value_dict, column_type, counter_flag):
   if(row_value_dict.get(column_type, None) == None):
@@ -1277,7 +1274,7 @@ def check_lane_sample_consistency( column_name_list, samplesheet_row_list ):
     o  flags
     o  tissue
     o  wrap_group
-    o  hash_reads
+    o  hash_file
   """
   # Initialize counters.
   counter = dict()
@@ -1309,7 +1306,7 @@ def check_lane_sample_consistency( column_name_list, samplesheet_row_list ):
     counter[lanes_value]['sample_name'][sample_name_value] = counter_set_value(counter[lanes_value]['sample_name'][sample_name_value], row_value_dict, 'sample_flags', True)
     counter[lanes_value]['sample_name'][sample_name_value] = counter_set_value(counter[lanes_value]['sample_name'][sample_name_value], row_value_dict, 'tissue', True)
     counter[lanes_value]['sample_name'][sample_name_value] = counter_set_value(counter[lanes_value]['sample_name'][sample_name_value], row_value_dict, 'wrap_group', True)
-    counter[lanes_value]['sample_name'][sample_name_value] = counter_set_value(counter[lanes_value]['sample_name'][sample_name_value], row_value_dict, 'hash_reads', True)
+    counter[lanes_value]['sample_name'][sample_name_value] = counter_set_value(counter[lanes_value]['sample_name'][sample_name_value], row_value_dict, 'hash_file', True)
 
   # print(json.dumps(counter, indent=2))
 
@@ -1333,7 +1330,7 @@ def check_lane_sample_consistency( column_name_list, samplesheet_row_list ):
   # Lane + sample tests.
   print('  Check lane- and sample-oriented value consistency...')
   error_flag_2 = False
-  sample_test_list = ['genome', 'sample_flags', 'tissue', 'wrap_group', 'hash_reads']
+  sample_test_list = ['genome', 'sample_flags', 'tissue', 'wrap_group', 'hash_file']
   for lanes in counter.keys():
     for sample_test in sample_test_list:
       if(not sample_test in row_value_dict.keys()):
@@ -1557,7 +1554,7 @@ def set_default_lanes_value( row_out_list, number_lanes ):
   return( 0 )
 
 
-# Finish by adding lanes and hash_reads.
+# Finish by adding lanes and hash_file.
 def make_samplesheet_indexes( column_name_list, samplesheet_row_list, number_lanes ):
   """
   Make well index lists for rt, p5, p7 barcode wells from the input samplesheet information.
@@ -1573,7 +1570,7 @@ def make_samplesheet_indexes( column_name_list, samplesheet_row_list, number_lan
     external_sample_name = ''
     tissue = ''
     wrap_group = ''
-    hash_reads = ''
+    hash_file = ''
     sample_flags_list = ''
     library = ''
     process_group = ''
@@ -1630,6 +1627,9 @@ def make_samplesheet_indexes( column_name_list, samplesheet_row_list, number_lan
           library = element_string
       elif( column_name_dict['type'] == 'process_group' ):
           process_group = element_string
+      elif( column_name_dict['type'] == 'hash_file' ):
+          hash_file = element_string
+
 
     #
     row_out_list.append( { 'sample_name': sample_name,
@@ -1642,7 +1642,7 @@ def make_samplesheet_indexes( column_name_list, samplesheet_row_list, number_lan
                            'wrap_group': wrap_group,
                            'sample_flags': sample_flags_list,
                            'lanes' : lane_list,
-                           'hash_reads' : hash_reads,
+                           'hash_file' : hash_file,
                            'rt_file' : rt_file,
                            'ligation_file' : ligation_file,
                            'p7_file' : p7_file,
@@ -1870,7 +1870,7 @@ def write_samplesheet_json_format( file, column_name_list, samplesheet_row_list,
                                 'lanes' : lanes,
                                 'tissue' : row_out['tissue'],
                                 'genome' : row_out['genome'],
-                                'hash_reads' : row_out['hash_reads'],
+                                'hash_file' : row_out['hash_file'],
                                 'sample_flags' : ','.join( row_out['sample_flags'] ),
                                 'external_sample_name' : row_out['external_sample_name'],
                                 'wrap_group' : row_out['wrap_group'],
@@ -2190,7 +2190,7 @@ def samplesheet_report( samplesheet_row_list, row_out_list, wrap_groups_dict, ar
 def write_samplesheet_template():
   filename = 'samplesheet.template.csv'
   with open( filename, 'wt' ) as fp:
-    print( 'rt_wells,p7_rows,p5_columns,sample_name,genome,external_sample_name,tissue,wrap_group,lanes,hash_reads,sample_flags', file=fp )
+    print( 'rt_wells,p7_rows,p5_columns,sample_name,genome,external_sample_name,tissue,wrap_group,lanes,hash_file,sample_flags', file=fp )
   return( 0 )
 
 
@@ -2212,9 +2212,9 @@ if __name__ == '__main__':
   #
   print('================================================================================', file=sys.stderr)
   print('Need to do:', file=sys.stderr)
-  print('  *  two points: (a) if there is no \'lanes\' column set the lanes value in the JSON file to 1-<number_lanes> and (b) when the lanes column exists, disallow empty cells in the column.', file=sys.stderr)
+  print('  *  two points: (a) if there is no \'lanes\' column set the lanes value in the JSON file to 1 to <number_lanes> (1-<number_lanes>) and (b) when the lanes column exists, disallow empty cells in the column.', file=sys.stderr)
   print('  *  where lanes element is used, expand and contract in\n     order to normalize entries (in case a lane set is described\n     with different but equivalent strings)', file=sys.stderr)
-  print('  o  test the two modifications above', file=sys.stderr)
+  print('  *  test the two modifications above', file=sys.stderr)
   print('  o  update documentation/help notes', file=sys.stderr) 
   print('  o  make sample names distinct in cases where there are\n     different libraries of a sample (in different lanes)', file=sys.stderr)
   print('  o  add a command line option to dump diagnostic information', file=sys.stderr)
@@ -2270,7 +2270,7 @@ if __name__ == '__main__':
   check_tissue( column_name_list, samplesheet_row_list )
   check_wrap_group( column_name_list, samplesheet_row_list )
   check_lanes( column_name_list, samplesheet_row_list )
-  check_hash_reads( column_name_list, samplesheet_row_list )
+  check_hash_file( column_name_list, samplesheet_row_list )
   check_barcode_files( column_name_list, samplesheet_row_list )
   check_lane_sample_consistency( column_name_list, samplesheet_row_list )
   check_process_groups(column_name_list, samplesheet_row_list )

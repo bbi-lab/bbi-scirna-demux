@@ -1,2 +1,2 @@
-sample_name,genome,rt_wells,p7_rows,p5_columns,external_sample_name,tissue,wrap_group,hash_reads,lanes
-sample.1,mouse,"P1-A01:P1-A04,P1-C03:P1-C09","A","3",extsample.1,brain,Smith,true,1:4
+sample_name,genome,rt_wells,p7_rows,p5_columns,external_sample_name,tissue,wrap_group,hash_file,lanes
+sample.1,mouse,"P1-A01:P1-A04,P1-C03:P1-C09","A","3",extsample.1,brain,Smith,,1:4

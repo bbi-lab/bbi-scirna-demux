@@ -1,5 +1,5 @@
-lanes,sample_name,genome,rt_wells,p7_rows,p5_columns,rt_file,ligation_file,p7_file,p5_file,library,external_sample_name,tissue,wrap_group,hash_reads,sample_flags
-1:4,sample.1,mouse,"P2-A01:P2-A04,P1-C03:P1-C07","A,C","3,8","/net/bbi/barcodes/rt_file.txt","/net/bbi/barcodes/lig_file.txt","/net/bbi/barcodes/p7_file.txt","/net/bbi/barcodes/p5_file.txt","RNA3-088",extsample.1,brain,Smith,true,B
+lanes,sample_name,genome,rt_wells,p7_rows,p5_columns,rt_file,ligation_file,p7_file,p5_file,library,external_sample_name,tissue,wrap_group,hash_file,sample_flags
+1:4,sample.1,mouse,"P2-A01:P2-A04,P1-C03:P1-C07","A,C","3,8","/net/bbi/barcodes/rt_file.txt","/net/bbi/barcodes/lig_file.txt","/net/bbi/barcodes/p7_file.txt","/net/bbi/barcodes/p5_file.txt","RNA3-088",extsample.1,brain,Smith,,B
 1:4,sample.2,mouse,"P2-A04:P2-A08,P1-C08:P1-C11","A,C","3,8","/net/bbi/barcodes/rt_file.txt","/net/bbi/barcodes/lig_file.txt","/net/bbi/barcodes/p7_file.txt","/net/bbi/barcodes/p5_file.txt","RNA3-088",extsample.2,lung,Smyth,false,S
-5:8,sample.1,mouse,"P2-A01:P2-A04,P1-C03:P1-C07","A,C","3,8","/net/bbi/barcodes2/rt_file.txt","/net/bbi/barcodes2/lig_file.txt","/net/bbi/barcodes2/p7_file.txt","/net/bbi/barcodes2/p5_file.txt","RNA3-088",extsample.1,brain,Smith,true,B
+5:8,sample.1,mouse,"P2-A01:P2-A04,P1-C03:P1-C07","A,C","3,8","/net/bbi/barcodes2/rt_file.txt","/net/bbi/barcodes2/lig_file.txt","/net/bbi/barcodes2/p7_file.txt","/net/bbi/barcodes2/p5_file.txt","RNA3-088",extsample.1,brain,Smith,,B
 5:8,sample.2,mouse,"P2-A04:P2-A08,P1-C08:P1-C11","A,C","3,8","/net/bbi/barcodes2/rt_file.txt","/net/bbi/barcodes2/lig_file.txt","/net/bbi/barcodes2/p7_file.txt","/net/bbi/barcodes2/p5_file.txt","RNA3-088",extsample.2,lung,Smyth,false,S
