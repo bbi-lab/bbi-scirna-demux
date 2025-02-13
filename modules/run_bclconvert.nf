@@ -18,8 +18,10 @@ process run_bclconvert {
   #
   # Infer the p5 barcode orientation from the flowcell RunParameters.xml file.
   #
-  RCMP=`read_run_info.py ${illumina_run} RNA-seq`
-echo \$RCMP >  /net/bbi/vol1/data/bge/bbi/tests/bbi-scirna-tests/rna3-065-a.rcmp/rcmp.txt
+  # I believe that bcl-convert manages the P5 orientation.
+  #
+  RCMP='False'
+
   #
   # Run bcl-convert.
   #
