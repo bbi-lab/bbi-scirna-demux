@@ -301,7 +301,8 @@ struct SampleMap {
   ligation_file: String,
   p7_file: String,
   p5_file: String,
-  library: String
+  library: String,
+  process_group: String
 }
 
 

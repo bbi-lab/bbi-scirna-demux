@@ -225,7 +225,7 @@ def make_barcode_seq_dict(barcode_path_dict, p7_well_to_index_dict, p5_well_to_i
     p5_barcodes = read_barcodes(p5_file)
     barcode_seq_dict[lane]['p5'] = {}
     for well in p5_barcodes.keys():
-      if(p5_rcmp):
+      if(p5_rcmp == 'True'):
         barcode_seq_dict[lane]['p5'][p5_well_to_index_dict[well]] = reverse_complement(p5_barcodes[well])
       else:
         barcode_seq_dict[lane]['p5'][p5_well_to_index_dict[well]] = p5_barcodes[well]
