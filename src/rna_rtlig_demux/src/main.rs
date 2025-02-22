@@ -33,6 +33,13 @@ const MAX_NUM_PLATES: usize = 16;
 **   https://docs.rs/rust-htslib/latest/rust_htslib/bam/struct.Writer.html
 */
 
+/*
+** Notes:
+**   o well P01-A01 has index 1
+**   o index 1 encoded as base4 has sequence AAAAAAC
+*/
+
+
 use std::io::Write;
 use std::error::Error;
 use std::collections::HashMap;
