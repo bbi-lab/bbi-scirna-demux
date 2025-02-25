@@ -37,6 +37,7 @@ const MAX_NUM_PLATES: usize = 16;
 ** Notes:
 **   o well P01-A01 has index 1
 **   o index 1 encoded as base4 has sequence AAAAAAC
+**   o index 0 represents no barcode; e.g., no p5 sequence.
 */
 
 
