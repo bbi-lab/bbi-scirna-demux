@@ -1,5 +1,28 @@
 #!/usr/bin/env python3
 
+#
+# TODO:
+#   o  add process_group documentation
+#        o  define it
+#        o  explain rationale for adding it
+#        o  show examples
+#        o  explain file name formats:
+#             o  demuxed filename
+#             o  merged demuxed filename
+#   o  compare documentation to functionality
+#
+#
+#   o  column_header_name_list = [ 'rt_wells', 'sample_name', 'genome', 'sample_flags', 'external_sample_name', 'tissue', 'wrap_group', 'lanes', 'hash_file', 'rt_file', 'ligation_file', 'p7_file', 'p5_file', 'library', 'process_group' ]
+#   o  columns_required_list = [ 'rt', 'p5', 'p7', 'sample_name', 'genome' ]
+#   o  check --lanes as optional parameter (uses -n <n> to define default)
+#   o  point out the different samples may have different rt_file, ligation_file,
+#      p7_file, p5_file, and hash_file values in case of different libraries
+#   o  check sample_flags description for completeness
+#        o  the flags are used to identify certain sample types, which receive
+#           type-specific processing.
+#        o  the sample
+#   o  explain how values are used in the pipelines
+
 
 #
 # Notes:
@@ -20,39 +43,44 @@ Input (front-end) samplesheet format:
   o  the header values do not depend on case
   o  checks rows:
        o  trims off extra cells from rows when a data row has more cells
-          than the header line
-       o  ignores rows with all empty cells
+          than the header line.
+       o  ignores rows with all empty cells.
   o  the first row is a header with the following required columns:
        o  rt barcode identifier with value: 'rt_wells'.
        o  p7 barcode identifier with value: 'p7_wells' or 'p7_rows'.
        o  p5 barcode identifier with value: 'p5_wells' or 'p7_columns'.
-       o  sample name identifier with value: 'sample_name'
-       o  genome label identifier with value: 'genome'
-     and the following optional columns:
-       o  sample_flags sample identifier with values: 's', 'S', 'b', 'B', 'K'
-       o  external_sample_name the name of the sample supplied by the sample
-          submitter
-       o  tissue the name of the tissue from which the sample was collected
-       o  wrap_group the name of the group to which the results will
-          be distributed. This information is used by the bbi-sciatac-wrap
+       o  sample name identifier with value: 'sample_name'.
+       o  genome label identifier with value: 'genome'.
+     and the following optional column header values and column contents:
+       o  sample_flags: sample identifier with values: 's', 'S', 'b', 'B',
+          'k', 'K'.
+       o  external_sample_name: the name of the sample supplied by the sample
+          submitter.
+       o  tissue: the name of the tissue from which the sample was collected
+       o  wrap_group: the name of the group to which the results will
+          be distributed. This information is used by the bbi-scirna-wrap
           script.
-       o  lanes
-       o  hash_file
+       o  lanes: the flowcell lanes that have the sample
+       o  hash_file: the path to a text file that has the hash barcode
+          sequences for a sciPlex experiment.
        o  rt_file: path to custom RT primer barcode file.
        o  ligation_file: path to custom ligation barcode file.
        o  p7_file: path to custom P7 barcode file.
        o  p5_file: path to custom P5 barcode file.
        o  library: an arbitrary string, which can label the library or run.
           The intention is to store the string in the CDS.
-       o  process_group: an integer that distinguishes sets of samples
-          that are to be processed separately. For example, different
-          libraries that are run in different Novaseq X lanes or have
-          different sets of PCR primer pairs. Each sample in a process
-          group is given the same integer value. The samples in the first
-          group are given the value 1 and samples in additional groups are
-          given successive integer values. For example, 
+       o  process_group: an integer that distinguishes sets of samples that
+          are to be processed separately by these pipelines. For example,
+          different libraries that are run in different Novaseq X lanes or
+          have different sets of PCR primer pairs. Each sample in a process
+          group is given the same process_group integer value. The samples in
+          the first group are given the value 1 and samples in additional
+          groups are given successive integer values. It is important to set
+          the process_group values correctly when a run has more than one
+          library where different libraries may have samples with the same
+          names.
   o  sample names:
-       o  begin with an alphanumeric characters: a-z, A-Z, and 0-9
+       o  begin with an alphanumeric character: a-z, A-Z, and 0-9
        o  allowed characters are alphabetic (a-z and A-Z), numeric (0-9), and
           period '.'
        o  this program converts other characters in the sample name to '.',
@@ -67,21 +95,22 @@ Input (front-end) samplesheet format:
   o  genomes:
        o  recognized genome names are listed in the variable 'genome_name_list'
           in this program's code. If a samplesheet genome name is not in the
-          list, sciatac_samplesheet.py gives a warning in case the name is
+          list, scirna_samplesheet.py gives a warning in case the name is
           mis-spelled.
        o  genome is the name of the organism that was sequenced. This
           identifies the files required to analyze the reads. The genome string
           is passed to the processing pipeline, and the pipeline uses it to
-          find the required genome files. Available genomes are defined by the
-          'name' field in the bbi-sciatac-analyze/genomes.json file.
+          find the required genome files. The file system paths to the
+          available genomes are defined in the
+          bbi-scirna-analyze/bin/star_genomes.txt file.
   o  wrap_group:
        o  valid names consist of lower and upper case alphabetic characters,
           numerals, and the symbols '.', '_', and '-'. Cells may be empty in
-          which case those samples are excluded from the wrap.
+          which case those samples are excluded from the wrap output.
   o  wells:
-       o  samplesheet wells are converted to indexes where indexes refer to
+       o  samplesheet wells are converted to indices where indices refer to
           physical wells, which are in the following order: rt and p7
-          indexes increase by column number along each row and p5 indexes
+          indices increase by column number along each row and p5 indices
           increase by row letter down each column. This is important when
           specifying wells by ranges. For example, the p7 'A' row is given
           by A01:A12. The p7 '1' column must be specified by each well; that
@@ -90,8 +119,8 @@ Input (front-end) samplesheet format:
           the 12th column.) Similary, the p5 '1' column is given by A01:H01
           and the p5 'A' row is necessarily given as A01,A02,A03,A04,A05,
           A06,A07,A08,A09,A10,A11,A12 (NOT A01:A12).
-       o  the p7_well and p5_well or p7_rows and p5_columns is set to
-          '0' (zero)  when the corresponding index is not detected by the
+       o  the p7_well and p5_well or p7_rows and p5_columns is set to '0'
+          (zero)  when the corresponding index is not detected by the
           sequencing machine. If one p7 well is set to '0', all p7 wells
           must be '0'. The same is true for p5 wells, p7 rows, and p5
           columns.
@@ -130,8 +159,8 @@ Input (front-end) samplesheet format:
             o  3,4,5
             o  none
   o  p7 rows and p5 columns:
-       o  by default, the i-th p7 row is paired with the i-th p5 column.
-          No other combinations of specified rows and columns are considered.
+       o  by default, the i-th p7 row is paired with the i-th p5 column. No
+          other combinations of specified rows and columns are considered.
           Consequently, the order of the rows and columns must be correct.
           Technical notes:
             o  in order to restrict the PCR index combinations to one p7 row
@@ -140,43 +169,45 @@ Input (front-end) samplesheet format:
                p7 rows/p5 columns pairs given for the sample in the input CSV
                file. For example, if for a sample, the p7_rows specification
                is 'A,B' and the p5_columns is '6,5', this program outputs two
-               rows for the sample, the first with PCR row column pair A/6
+               rows for the sample, the first with PCR row/column pair A/6
                and the second with PCR row/column pair B/5.
   o  p7 wells and p5 wells
-       o  this program converts wells to indices and passes the indices to
-          the pipeline. The pipeline uses combinations of all p7 and p5
-          wells. The order of the wells is unimportant.
+       o  this program converts wells to indices and passes the indices to the
+          pipeline. The pipeline uses combinations of all p7 and p5 wells. The
+          order of the wells is unimportant.
   o  lanes:
-       o  given as a one or more lanes or ranges of lanes using a colon, ':',
-          to specify lane ranges, and commas, ',', to separate lane or
-          lane ranges. The lanes column may be omitted in which case all
-          lanes will be used for all samples. If the lane column is included,
-          all cells be set.
+       o  given as one or more lanes or ranges of lanes using a colon, ':',
+          to specify lane ranges, and commas, ',', to separate lanes or lane
+          ranges. The lanes column may be omitted in which case all lanes will
+          be used for all samples. If the lane column is included, all cells
+          must be set.
           examples:
             o  1:3
             o  1,3,5:8
   o  hash_file:
-       o  path to the hash barcode file for samples with hash reads; leave
-          the cell empty for samples without hash reads.
+       o  path to the hash barcode file for samples with hash reads; leave the
+          cell empty for samples without hash reads. Different samples in a run
+          may have different hash_file values.
   o  sample_flags:
-       o  sample_flags identify certain sample types, for example, Sentinal
-          and Barnyard. The allowed values are 's', 'S', 'b', and 'B'.
-          The sentinal samples are identified by an 's' and the barnyard
-          samples are identified by a 'b'. The samples with capitalized
-          letters are used in the dashboard sentinal and barnard displays.
-          Cells may be empty.
+       o  sample_flags identify certain sample types, for example, Sentinel and
+          Barnyard. The allowed values are 's', 'S', 'b', 'B', 'k', and 'K'.
+          The sentinel samples are identified by an 's' the barnyard samples
+          are identified by a 'b', and the keyhole experiment is identified by
+          'k'. The samples with capitalized letters are used in the dashboard
+          sentinel, barnyard, and keyhole reports. Cells may be empty. 
   o  rt_file, ligation_file, p7_file, p5_file:
        o  paths to custom barcode files. The path is not checked for validity.
           Empty cells denote use of the default barcode file.
   o  library:
-       o  library an arbitrary string that can used to identify the
-          sequencing library
+       o  library an arbitrary string that can used to identify the sequencing
+          library
   o  process_group:
        o  a process_group is a single integer value
        o  each sample in a group is given the same integer value
        o  the samples in the first group are given the value 1
        o  samples in additional groups are given successive integer
           values.
+
   Example samplesheet file:
 
   sample_name,genome,rt_wells,p7_wells,p5_wells,external_sample_name,tissue,wrap_group,hash_file,lanes,sample_flags
@@ -188,20 +219,64 @@ Input (front-end) samplesheet format:
     o  the well value sets are enclosed in quotes in this example because the
        sets may have commas.  Do not use quotes in the spreadsheet program
        cells; the spreadsheet program adds them when it writes the CSV file.
-    o  the lane values in all rows with the same process group and sample_name
-       are used for the pcr pair combinations in rows with the same
-       process_group and sample_name combinations. For example, samplesheet
-       rows with
-         row 1: p7=A01, p5=C03, lanes=1:2
-         row 2: p7=B01, p5=C04, lanes=3:4
-       result in combining lanes 1:4 for both pcr pair combinations p7=A01, p5=C03
-       and p7=B01, p5=C04. If you want row 1 to combine only lanes 1 and 2 and 
-       row 2 to combine only lanes 3 and 4, use distinct process_group values for
-       the spreadsheet rows.
+    o  the '-n' command line parameter identifies the number of flowcell
+       lanes.
+    o  when the lanes column is absent, it is assumed that all samples are
+       present in all lanes.
+    o  these pipelines store reads in BAM files (unaligned and aligned).
+    o  the general work flow is
+         o  bcl-convert makes fastq files demultiplexed by PCR barcode pairs.
+            There is one fastq file for each valid PCR barcode pair (and the
+            fastq filenames have the p7 and p5 barcode sequence indices, as
+            well as the lane number, in them). These fastq files are used
+            internally only, and are not returned to the user, i.e.,
+            'published' by the Nextflow pipeline.
+         o  the reads in these fastq files are demultiplexed by RT and ligation
+            barcodes. The RT barcodes identify reads by sample. The resulting
+            reads are written to unaligned BAM files where all reads in a BAM
+            file have the same lane and rt, p7, and p5 barcodes. The barcode
+            sequence indices and lane number are part of the BAM file name.
+            These BAM files are 'published' to the 'demux_out' directory.
+         o  these (sample, pcr pair, lane) BAM files are merged such that
+            reads in the output BAM file belong to the same sample,
+            process_group, and have the same p7 and p5 barcodes. This means
+            that BAM files whose reads have the same sample_name,
+            process_group, p7 barcode, and p5 barcode, but different lanes,
+            are merged. If you have the same sample, with the same sample_name,
+            in multiple libraries, each library run in a different lane, and
+            you need the pipeline to process separately the reads from each
+            library, assign a distinct process_group value to the sample
+            entries for each library. These merged BAM files are not
+            'published'.
+         o  the unaligned BAM files are processed by bbduk.sh to trim off
+            adapter sequence. These trimmed BAM files are not published.
+         o  the trimmed read BAM files are aligned to the reference genome by
+            STARsolo and the aligned reads are assigned to cells. STARsolo
+            output files are for reads that have the same sample_name,
+            process_group, and p7 and p5 barcodes. These aligned read BAM
+            files are not 'published'.
+         o  these (sample, process_group, pcr pair) aligned output files are
+            merged such that all reads with the same sample_name and
+            process_group, are written to the same output BAM file. This means
+            that BAM files with the same sample_name and process_group, but
+            different p7 and/or p5 barcodes, are merged. If you have samples
+            in a lane that have the same sample_name but are from different
+            libraries, where these samples are distinguished using different
+            p7 and p5 barcode combinations, you must assign the samples
+            distinct process_group values to avoid merging their reads by
+            this stage. The merged BAM, count matrix, and statistics files
+            are 'published' to the 'analyze_out' directory.
+         o  a cds file and umap.png file are made for each sample,
+            process_group count matrix.
+         o  when the hash_file value is set for a sample, the untrimmed BAM
+            files are processed to find candidate hash reads and a cds is
+            made with the hash read information.
 
 Command line options:
 
-usage: scirna_samplesheet.py [-h] -i INPUT -o OUTPUT [-s SEQUENCER_CLASS] [-r RUN_DIR] [-l {2,3}] [-e] [-d] [-v]
+usage: scirna_samplesheet.py [-h] [-i INPUT] [-o OUTPUT] [-s SEQUENCER_CLASS]
+                             [-r RUN_DIR] [-l {2,3}] [-n NUMBER_LANES] [-e]
+                             [-d] [-v]
 
 A program to convert sci-RNA CSV samplesheet to pipeline samplesheet.
 
@@ -212,19 +287,25 @@ options:
   -o OUTPUT, --output OUTPUT
                         Output samplesheet filename (required string).
   -s SEQUENCER_CLASS, --sequencer_class SEQUENCER_CLASS
-                        Sequencing machine class (not required string: 'illumina' or 'ultima'. Default: illumina
+                        Sequencing machine class (not required string:
+                        'illumina' or 'ultima'. Default: illumina
   -r RUN_DIR, --run_dir RUN_DIR
                         Illumina run directory path (optional string).
   -l {2,3}, --level {2,3}
-                        Two or three level sci-ATAC-seq experiment (default: 3) (optional integer).
-  -n, --number_lanes    Number of flowcell lanes. (integer).
-  -e, --template        Write template samplesheet file ('samplesheet.template.csv') with standard column formats and exit (optional flag).
+                        Two or three level sci-rna-seq experiment (default:
+                        3) (optional integer).
+  -n NUMBER_LANES, --number_lanes NUMBER_LANES
+                        Number of flowcell lanes (required integer).
+  -e, --template        Write template samplesheet file
+                        ('samplesheet.template.csv') with standard column
+                        formats and exit (optional flag).
   -d, --documentation   Display documentation and exit (optional flag).
-  -v, --version         Give program and JSON output file versions and exit (optional flag).
+  -v, --version         Give program and JSON output file versions and exit
+                        (optional flag).
 """
 
 #
-# Add column
+# Adding a new column:
 #   o  add to column_header_name_list, columns_required_list or columns_optional_list, and, maybe column_allow_empty_cell
 #   o  edit parse_header_column_name() to add condition in if elif ... statement to give value to column_name_dict
 #   o  edit make_samplesheet_indexes() to add to row_out_list.append()  # add an elif() too
@@ -246,18 +327,13 @@ import copy
 #
 # Samplesheet JSON file version.
 #
-program_version = '0.1.7'
+program_version = '0.1.8'
 json_file_version = '1.0.0'
 
 
 #
 # Default barcode file paths.
 #
-#default_rt_file = '/home/bbi/barcode_files/rt_file'
-#default_ligation_file = '/home/bbi/barcode_files/ligation_file'
-#default_p7_file = '/home/bbi/barcode_files/p7_file'
-#default_p5_file = '/home/bbi/barcode_files/p5_file'
-
 default_rt_file = ''
 default_ligation_file = ''
 default_p7_file = ''
@@ -337,7 +413,7 @@ p5_re_col_pattern_2 = r'([0-9][0-2]?)([-:]([0-9][0-2]?))?$'
 #
 # sample_flags regex.
 #
-sample_flags_re_pattern = r'([sSbB])$'
+sample_flags_re_pattern = r'([sSbBkK])$'
 
 
 # OK
@@ -631,8 +707,8 @@ def index_string_to_well_string( index_string, across_row_first, show_plate ):
 def check_index_list( index_type, index_list, element_coordinates = [ None, None ] ):
   """
   Check and clean index list
-    o  check for duplicate indexes
-    o  remove duplicate indexes
+    o  check for duplicate indices
+    o  remove duplicate indices
   """
   index_dict = {}
   for i in index_list:
@@ -644,7 +720,7 @@ def check_index_list( index_type, index_list, element_coordinates = [ None, None
       duplicate_list.append( str( i ) )
   if( len( duplicate_list ) > 0 ): 
     print( 'Warning: spreadsheet cell: %s %s: duplicate %s index(es): %s' % ( index_type, element_coordinates[0], element_coordinates[1], ' '.join( sorted(duplicate_list) ) ), file=sys.stderr )
-    print( '         These indexes are duplicated within the reported spreadsheet cell, which may be intentional.')
+    print( '         These indices are duplicated within the reported spreadsheet cell, which may be intentional.')
   return( list( set( index_list ) ) ) 
 
 
@@ -668,10 +744,10 @@ def make_index_list( index_string ):
 # OK
 def make_index_string( index_list ):
   """
-  Convert a list of (integer) barcode well indexes to an index string where
-    o  repeated indexes are dropped; that is, keep only distinct indexes
+  Convert a list of (integer) barcode well indices to an index string where
+    o  repeated indices are dropped; that is, keep only distinct indices
     o  sequences of counting numbers are expressed as ranges, for example, 5 6 7 8 9 => 5-9
-    o  indexes and index ranges are separated by commas
+    o  indices and index ranges are separated by commas
   """
   index_string = ''
   if( len( index_list ) == 0 ):
@@ -1662,7 +1738,7 @@ def make_samplesheet_indexes( column_name_list, samplesheet_row_list, number_lan
 def check_pcr_indexes( row_out_list ):
   for irow, row_out in enumerate( row_out_list ):
     if( row_out['p7_index_list'] == [0] and row_out['p5_index_list'] == [0] ):
-      print( 'Error: row %d: both p7 and p5 well indexes are 0' % ( irow + 2 ) )
+      print( 'Error: row %d: both p7 and p5 well indices are 0' % ( irow + 2 ) )
       sys.exit( -1 )
 
 # OK
@@ -1952,7 +2028,7 @@ def write_samplesheet_json_format( file, column_name_list, samplesheet_row_list,
 
 
 #
-# Count distinct well indexes.
+# Count distinct well indices.
 #
 def count_wells( index_list ):
   num_well = len( set( index_list ) )
@@ -2183,7 +2259,7 @@ def samplesheet_report( samplesheet_row_list, row_out_list, wrap_groups_dict, ar
                                              row_out.get('wrap_group', '')))
 
   print( '  Illumina run directory: %s' % ( args.run_dir ) )
-  print( '  Run sciatac_samplesheet.py -d for more information.' )
+  print( '  Run scirna_samplesheet.py -d for more information.' )
   return( 0 )
 
 
@@ -2200,7 +2276,7 @@ if __name__ == '__main__':
   parser.add_argument('-o', '--output', required=False, default=None, help='Output samplesheet filename (required string).')
   parser.add_argument('-s', '--sequencer_class', required=False, default='illumina', help='Sequencing machine class (not required string: \'illumina\' or \'ultima\'. Default: illumina')
   parser.add_argument('-r', '--run_dir', required=False, default=None, help='Illumina run directory path (optional string).')
-  parser.add_argument('-l', '--level', type=int, required=False, choices=[ 2, 3 ], default=3, help='Two or three level sci-ATAC-seq experiment (default: %(default)s) (optional integer).')
+  parser.add_argument('-l', '--level', type=int, required=False, choices=[ 2, 3 ], default=3, help='Two or three level sci-RNA-seq experiment (default: %(default)s) (optional integer).')
   parser.add_argument('-n', '--number_lanes', type=int, required=False, default=None, help='Number of flowcell lanes (required integer).')
   parser.add_argument('-e', '--template', required=False, action='store_true', help='Write template samplesheet file (\'samplesheet.template.csv\') with standard column formats and exit (optional flag).')
   parser.add_argument('-d', '--documentation', required=False, action='store_true', help='Display documentation and exit (optional flag).')
@@ -2248,7 +2324,7 @@ if __name__ == '__main__':
     error_string += '  number_lanes parameter: -n <number_lanes>\n'
   if( len( error_string ) > 0 ):
     print( 'Error: missing command line parameters\n%s' % ( error_string ) )
-    print( 'For help run \'sciatac_samplesheet.py -h\' or \'sciatac_samplesheet.py -d\'' )
+    print( 'For help run \'scirna_samplesheet.py -h\' or \'scirna_samplesheet.py -d\'' )
     sys.exit( -1 )
 
   #
