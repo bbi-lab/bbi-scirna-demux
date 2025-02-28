@@ -103,6 +103,11 @@ fn set_cl_options() -> Result<clap::Command, Box<dyn Error>> {
                   .default_value("1")
                   .value_parser(clap::value_parser!(usize))
                   .help("Number of threads for BAM compression."))
+        .arg(Arg::new("barcode_recipe")  // required=false, default 'std_1'
+                  .long("recipe")
+                  .number_of_values(1)
+                  .default_value("std_1")
+                  .help("RT, ligation, and UMI barcode position \'recipe\'."))
         .arg(Arg::new("output_file_format")     // required=false, default bam
                   .required(false)
                   .short('f')
@@ -892,6 +897,15 @@ fn process_reads(fastq1_file: &str,
     lig_10_slice = 0..10;
     umi_10_slice = 16..24;
     rt_10_slice = 24..34;
+  }
+  else
+  if(recipe == "std_2") {
+    lig_9_slice = 0..10;
+    umi_9_slice = 16..24;
+    rt_9_slice = 24..34;
+    lig_10_slice = 0..11;
+    umi_10_slice = 17..25;
+    rt_10_slice = 25..35;
   }
   else {
     Err("Error: unrecognized recipe value.")?;
