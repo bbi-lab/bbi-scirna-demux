@@ -70,7 +70,7 @@ Use the *run.demux.sh* bash script to start the pipeline run.
 
 The output *.bam* files are in the directory demux_out. The *.bam* file contains unaligned read sequences and quality values as well as barcode data in the SAMtags.
 
-### Overview of the demux and analyze pipeline workflows.
+## Overview of the demux and analyze pipeline workflows.
 
 - bcl-convert makes fastq files demultiplexed by PCR barcode pairs. There is one fastq file for each acceptable PCR barcode pair (and the fastq filenames have the p7 and p5 barcode sequence indices, as well as the lane number, in them). These fastq files are used internally only, and are not returned to the user, i.e., 'published' by the Nextflow pipeline.
 - the reads in these fastq files are demultiplexed by RT and ligation barcodes. The RT barcodes identify reads by sample. The resulting reads are written to unaligned BAM files where all reads in a BAM file have the same lane and rt, p7, and p5 barcodes. The barcode sequence indices and lane number are part of the BAM file name. These BAM files are 'published' to the 'demux_out' directory.
