@@ -834,8 +834,10 @@ fn process_reads(fastq1_file: &str,
 
   let log = String::new();
 
-  let (ipl, p7_well_name) = barcode_utils::index_to_well(file_indices["p7"], true).unwrap();
-  let (ipl, p5_well_name) = barcode_utils::index_to_well(file_indices["p5"], false).unwrap();
+  let (ipl, p7_well) = barcode_utils::index_to_well(file_indices["p7"], true).unwrap();
+  let (ipl, p5_well) = barcode_utils::index_to_well(file_indices["p5"], false).unwrap();
+  let p7_well_name: String = format!("P{:02}-{}", ipl+1, p7_well);
+  let p5_well_name: String = format!("P{:02}-{}", ipl+1, p5_well);
 
   let p7_index_encoded = index_encoder[file_indices["p7"]].clone();
   let p5_index_encoded = index_encoder[file_indices["p5"]].clone();
