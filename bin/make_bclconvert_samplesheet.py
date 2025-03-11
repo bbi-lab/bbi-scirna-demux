@@ -58,7 +58,13 @@ import re
 #
 # Program version string.
 #
-program_version = '0.1.2'
+program_version = '0.2.0'
+
+
+#
+# ** Maximum number of microtiter plates.
+#
+MAX_NUM_PLATES = 8
 
 
 #
@@ -121,9 +127,12 @@ def index_to_well( well_index, across_row_first ):
 # Note: The indexes begin with 1 so well A01 has index 1.
 #
 def make_well_to_index_dict(across_row_first):
+  max_index = MAX_NUM_PLATES * 96
   well_index_dict = {}
-  for index in range(1, 97):
-    well_index_dict[index_to_well(index-1, across_row_first)[1]] = index
+  for index in range(1, max_index+1):
+    (ipl, well_id) = index_to_well(index-1, across_row_first)
+    well_str = 'P%02d-%s' % (ipl + 1, well_id)
+    well_index_dict[well_str] = index
   return(well_index_dict)
 
 #
