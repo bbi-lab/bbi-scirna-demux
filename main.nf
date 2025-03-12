@@ -15,6 +15,7 @@ params.output_dir = '/net/gs/vol1/home/bge/git/bbi-scirna-demux'
 ** 
 */
 params.bin_dir = workflow.projectDir + '/bin'
+params.recipe = 'std_1'      // barcode 'recipe'. 'std_1' is the default, which is for non-MegaSci. 'std_2' is for MegaSci.
 
 
 /*

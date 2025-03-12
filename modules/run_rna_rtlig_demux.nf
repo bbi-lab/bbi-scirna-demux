@@ -26,6 +26,7 @@ process run_rna_rtlig_demux {
                                            -r $rt_file \
                                            -l $ligation_file \
                                            -f bam \
+                                           --recipe ${params.recipe} \
                                            --ncpu 3
   """
 }
