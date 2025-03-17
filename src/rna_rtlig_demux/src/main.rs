@@ -451,7 +451,7 @@ struct BarcodeIdentifier {
 **   o  make well name to index hashmap with plate identifiers
 **   o  make the barcode_id_map
 */
-fn make_barcode_id_map(sample_map_vec: &Vec<SampleMap>, barcode_type: &str, default_file: &str, recipe: &str) -> Result<HashMap<Vec<u8>, BarcodeIdentifier>, Box<dyn Error>> {
+fn make_barcode_id_map(sample_map_vec: &Vec<SampleMap>, barcode_type: &str, default_file: &str) -> Result<HashMap<Vec<u8>, BarcodeIdentifier>, Box<dyn Error>> {
   /*
   ** Find barcode file path.
   ** Check the samplesheet json file for a file path. If zero length, use default path.
@@ -473,7 +473,7 @@ fn make_barcode_id_map(sample_map_vec: &Vec<SampleMap>, barcode_type: &str, defa
   }
   else if(barcode_type == "ligation_file") {
     for sample_map in sample_map_vec.iter() {
-      if(sample_map.rt_file.len() > 0) {
+      if(sample_map.ligation_file.len() > 0) {
         file_name = sample_map.ligation_file.clone();
         break
       }
@@ -492,6 +492,10 @@ fn make_barcode_id_map(sample_map_vec: &Vec<SampleMap>, barcode_type: &str, defa
 
   /*
   ** Read the barcodes into a HashMap keyed by barcode sequence.
+  **
+  ** Notes:
+  **   o  build index map across utiter plate rows first for both
+  **      the rt and ligation indices.
   */
   let barcode_whitelist = rna_rtlig_demux::barcode_utils::read_barcode_file(&file_name).unwrap();
   let num_barcode: usize = barcode_whitelist.keys().len();
@@ -836,8 +840,8 @@ fn process_reads(fastq1_file: &str,
 
   let (ipl, p7_well) = barcode_utils::index_to_well(file_indices["p7"], true).unwrap();
   let (ipl, p5_well) = barcode_utils::index_to_well(file_indices["p5"], false).unwrap();
-  let p7_well_name: String = format!("P{:02}-{}", ipl+1, p7_well);
-  let p5_well_name: String = format!("P{:02}-{}", ipl+1, p5_well);
+  let p7_well_name: String = format!("P{:02}-{}", ipl, p7_well);
+  let p5_well_name: String = format!("P{:02}-{}", ipl, p5_well);
 
   let p7_index_encoded = index_encoder[file_indices["p7"]].clone();
   let p5_index_encoded = index_encoder[file_indices["p5"]].clone();
@@ -919,7 +923,6 @@ fn process_reads(fastq1_file: &str,
   ** Process the reads from the input fastq file pair.
   */
   loop {
-    nrecord += 1;
 
 /*
     if(nrecord >= 10) {
@@ -932,6 +935,8 @@ fn process_reads(fastq1_file: &str,
     if(fastq_record1.is_empty() || fastq_record2.is_empty()) {
       break;
     }
+
+    nrecord += 1;
 
     /*
     ** Check that names of reads 1 and 2 match.
@@ -1345,6 +1350,7 @@ fn main() {
   let default_ligation_file: String = cl_arg.get_one::<String>("ligation_barcode_file").unwrap().to_string();
   let output_file_format: String    = cl_arg.get_one::<String>("output_file_format").unwrap().to_string();
   let num_threads: usize            = cl_arg.get_one::<usize>("number_bam_threads").unwrap().clone();
+  let barcode_recipe                = cl_arg.get_one::<String>("barcode_recipe").unwrap().to_string();
   let uncompress_flag: bool         = cl_arg.get_flag("uncompressed_fastqs");
 
   println!("");
@@ -1355,6 +1361,7 @@ fn main() {
   println!("ligation default: {}", default_ligation_file);
   println!("out format:       {}", output_file_format);
   println!("num threads:      {}", num_threads);
+  println!("barcode recipe    {}", barcode_recipe);
   println!("uncompressed:     {}", uncompress_flag);
   println!("");
 
@@ -1467,9 +1474,8 @@ fn main() {
   /*
   ** Make a lane to barcode file map with fastq output file indices.
   */
-  let recipe = "std_1";
-  let mut rt_barcode_id_map = make_barcode_id_map(&sample_map_vec, "rt_file", &default_rt_file, recipe).unwrap();
-  let mut ligation_barcode_id_map = make_barcode_id_map(&sample_map_vec, "ligation_file", &default_ligation_file, recipe).unwrap();
+  let mut rt_barcode_id_map = make_barcode_id_map(&sample_map_vec, "rt_file", &default_rt_file).unwrap();
+  let mut ligation_barcode_id_map = make_barcode_id_map(&sample_map_vec, "ligation_file", &default_ligation_file).unwrap();
 
   /*
   ** Make sample-related index maps.
@@ -1499,7 +1505,7 @@ fn main() {
                         &mut rt_barcode_id_map,
                         &mut ligation_barcode_id_map,
                         &file_indices,
-                        &recipe,
+                        &barcode_recipe,
                         &index_encoder,
                         &output_file_format,
                         uncompress_flag,
