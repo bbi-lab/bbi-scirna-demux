@@ -1,5 +1,5 @@
 #![allow(unused_parens)]
-#![allow(unused_variables)]
+//#![allow(unused_variables)]
 //#![allow(warnings)] 
 
 #[global_allocator]
