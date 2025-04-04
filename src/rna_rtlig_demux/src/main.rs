@@ -14,7 +14,6 @@ const MAX_NUM_PLATES: usize = 16;
 /*
 ** Input reads from BAM
 **   https://github.com/alexdobin/STAR/blob/master/docs/STARsolo.md#input-reads-from-bam-files
-**   https://github.com/alexdobin/STAR/blob/master/docs/STARsolo.md#input-reads-from-bam-files
 **   --soloInputSAMattrBarcodeSeq CR UR    --soloInputSAMattrBarcodeQual CY UY
 **   --readFilesIn input.bam --readFilesType SAM SE
 **   --readFilesCommand samtools view -F 0x100
@@ -358,17 +357,12 @@ fn deserialize_sample_map_vector(samplesheet_json: serde_json::Value) -> Result<
 ** a sample map that contains a ranges string.
 */
 fn get_sample_index_vecs(sample_map: &SampleMap) -> Result<(Vec<usize>, Vec<usize>, Vec<usize>, Vec<usize>), Box<dyn Error>> {
-  let lane_index_vec: Vec<usize> = Vec::new();
-  let rt_index_vec: Vec<usize> = Vec::new();
-  let p7_index_vec: Vec<usize> = Vec::new();
-  let p5_index_vec: Vec<usize> = Vec::new();
-
-  let lane_index_vec = make_index_vec(&sample_map.lanes).unwrap();
+  let lane_index_vec: Vec<usize> = make_index_vec(&sample_map.lanes).unwrap();
 
   let ranges_parts: Vec<&str> = sample_map.ranges.split(":").collect();
-  let rt_index_vec = make_index_vec(ranges_parts[0]).unwrap();
-  let p7_index_vec = make_index_vec(ranges_parts[1]).unwrap();
-  let p5_index_vec = make_index_vec(ranges_parts[2]).unwrap();
+  let rt_index_vec: Vec<usize> = make_index_vec(ranges_parts[0]).unwrap();
+  let p7_index_vec: Vec<usize> = make_index_vec(ranges_parts[1]).unwrap();
+  let p5_index_vec: Vec<usize> = make_index_vec(ranges_parts[2]).unwrap();
 
   Ok((lane_index_vec, rt_index_vec, p7_index_vec, p5_index_vec))
 }
@@ -457,7 +451,6 @@ fn make_barcode_id_map(sample_map_vec: &Vec<SampleMap>, barcode_type: &str, defa
   ** Check the samplesheet json file for a file path. If zero length, use default path.
   */
   let mut file_name = "".to_string();
-  let test_name = String::new();
 
   /*
   **  Set barcode file path using either the value in
@@ -631,7 +624,7 @@ fn make_index_maps(sample_map_vec: &Vec<SampleMap>,
   ** Declare and initialize well index to sample index map.
   */ 
   let mut well_index_to_sample_index_map: Vec<usize> = Vec::with_capacity(max_well_index + 1);
-  for i in 0..(max_well_index + 2) {
+  for _i in 0..(max_well_index + 2) {
     well_index_to_sample_index_map.push(0_usize);
   }
 
@@ -640,7 +633,7 @@ fn make_index_maps(sample_map_vec: &Vec<SampleMap>,
   */
   let mut sample_index_to_name_map: Vec<String> = Vec::with_capacity(num_samples);
   sample_index_to_name_map.push("Undetermined".to_string()); 
-  for i in 1..(num_samples + 1) {
+  for _i in 1..(num_samples + 1) {
     sample_index_to_name_map.push(String::from(""));
   }
   
@@ -839,8 +832,8 @@ fn process_reads(fastq1_file: &str,
   let log = String::new();
 
   let (ipl, p7_well) = barcode_utils::index_to_well(file_indices["p7"], true).unwrap();
-  let (ipl, p5_well) = barcode_utils::index_to_well(file_indices["p5"], false).unwrap();
   let p7_well_name: String = format!("P{:02}-{}", ipl, p7_well);
+  let (ipl, p5_well) = barcode_utils::index_to_well(file_indices["p5"], false).unwrap();
   let p5_well_name: String = format!("P{:02}-{}", ipl, p5_well);
 
   let p7_index_encoded = index_encoder[file_indices["p7"]].clone();
@@ -948,12 +941,7 @@ fn process_reads(fastq1_file: &str,
       std::process::exit(-1);
     }
 
-/*
-    let seq1 = fastq_record1.seq().clone();
-    let seq2 = fastq_record2.seq().clone();
-*/
     let seq1 = fastq_record1.seq();
-    let seq2 = fastq_record2.seq();
 
     /*
     ** 9 base ligation barcode candidate.
@@ -973,31 +961,29 @@ fn process_reads(fastq1_file: &str,
     ** Check for matches to known barcodes with and
     ** without mismatches.
     */
-    #[warn(unused_assignments)]
+    #[allow(unused_assignments)]
     let mut sample_index: usize       = 0_usize;
-    #[warn(unused_assignments)]
-    let mut rt_well_index: usize      = 0_usize;
-    #[warn(unused_assignments)]
+    #[allow(unused_assignments)]
     let mut rt_well_name: String      = String::new();
-    #[warn(unused_assignments)]
+    #[allow(unused_assignments)]
     let mut lig_well_name: String     = String::new();
-    #[warn(unused_assignments)]
+    #[allow(unused_assignments)]
     let mut rt_index_encoded: String  = String::new();
-    #[warn(unused_assignments)]
+    #[allow(unused_assignments)]
     let mut lig_index_encoded: String = String::new();
-    #[warn(unused_assignments)]
+    #[allow(unused_assignments)]
     let mut umi_seq: &[u8];
 
     /*
     ** Interior blocks limit scope of mutable borrows.
     */
-    #[warn(unused_assignments)]
+    #[allow(unused_assignments)]
     let mut rtlg_9_and_rtlg_10_flag = false;
-    #[warn(unused_assignments)]
+    #[allow(unused_assignments)]
     let mut rt_match_9_flag: bool   = false;
-    #[warn(unused_assignments)]
+    #[allow(unused_assignments)]
     let mut lig_match_9_flag: bool  = false;
-    #[warn(unused_assignments)]
+    #[allow(unused_assignments)]
     let mut rtlg_9_flag: bool       = false;
     {
       let mut rt_match_9_bi: &mut BarcodeIdentifier = &mut Default::default();
@@ -1023,7 +1009,6 @@ fn process_reads(fastq1_file: &str,
       if(rt_match_9_flag && lig_match_9_flag) {
         umi_seq           = umi_read_9;
         sample_index      = rt_match_9_bi.sample_index;
-        rt_well_index     = rt_match_9_bi.well_index;
         rt_well_name      = rt_match_9_bi.well_name.clone();
         lig_well_name     = lig_match_9_bi.well_name.clone();
         rt_index_encoded  = index_encoder[rt_match_9_bi.well_index].clone();
@@ -1037,7 +1022,9 @@ fn process_reads(fastq1_file: &str,
     }
     
 
+    #[allow(unused_assignments)]
     let mut rt_match_10_flag: bool  = false;
+    #[allow(unused_assignments)]
     let mut lig_match_10_flag: bool = false;
     let mut rtlg_10_flag: bool      = false;
     {
@@ -1065,7 +1052,6 @@ fn process_reads(fastq1_file: &str,
         if(rtlg_9_flag == false) {
           umi_seq           = umi_read_10;
           sample_index      = rt_match_10_bi.sample_index;
-          rt_well_index     = rt_match_10_bi.well_index;
           rt_well_name      = rt_match_10_bi.well_name.clone();
           lig_well_name     = lig_match_10_bi.well_name.clone();
           rt_index_encoded  = index_encoder[rt_match_10_bi.well_index].clone();
@@ -1126,15 +1112,15 @@ fn process_reads(fastq1_file: &str,
                                                                                lig_well_name,
                                                                                umi_seq_string);
 
-    let barcode_umi_seq: String = format!("{:A>7}{:A>7}{:A>7}{:A>7}{}",
-                                          rt_index_encoded,
-                                          lig_index_encoded,
-                                          p7_index_encoded,
-                                          p5_index_encoded,
-                                          umi_seq_string);
 
     if(output_file_format == "fastq") {
       {
+        let barcode_umi_seq: String = format!("{:A>7}{:A>7}{:A>7}{:A>7}{}",
+                                              rt_index_encoded,
+                                              lig_index_encoded,
+                                              p7_index_encoded,
+                                              p5_index_encoded,
+                                              umi_seq_string);
         let writer1 = &mut fastq_writer_vec[0][sample_index];
         writer1.write(&read_out_header,
                       None,
@@ -1152,12 +1138,11 @@ fn process_reads(fastq1_file: &str,
     }
     else
     if(output_file_format == "bam") {
-    let cell_barcode: String = format!("{:A>7}{:A>7}{:A>7}{:A>7}",
-                                       rt_index_encoded,
-                                       lig_index_encoded,
-                                       p7_index_encoded,
-                                       p5_index_encoded);
-      let umi_seq: String = format!("{}", std::str::from_utf8(umi_seq).unwrap().to_string());
+    let cell_barcode_string: String = format!("{:A>7}{:A>7}{:A>7}{:A>7}",
+                                              rt_index_encoded,
+                                              lig_index_encoded,
+                                              p7_index_encoded,
+                                              p5_index_encoded);
 
       let mut record: rust_htslib::bam::Record = rust_htslib::bam::Record::new();
 
@@ -1174,8 +1159,12 @@ fn process_reads(fastq1_file: &str,
                  None,
                  fastq_record2.seq(),
                  &qual_bam);
-      record.push_aux("sS".as_bytes(), rust_htslib::bam::record::Aux::String(&barcode_umi_seq)).expect("Error: unable to add barcode sequence to BAM record tags.");
-      record.push_aux("sQ".as_bytes(), rust_htslib::bam::record::Aux::String("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")).expect("Error: unable to add barcode quality values to BAM record tags.");
+
+      record.push_aux("CB".as_bytes(), rust_htslib::bam::record::Aux::String(&cell_barcode_string)).expect("Error: unable to add barcode sequence to BAM record tags.");
+      record.push_aux("CY".as_bytes(), rust_htslib::bam::record::Aux::String("CCCCCCCCCCCCCCCCCCCCCCCCCCCC")).expect("Error: unable to add barcode sequence to BAM record tags.");
+      record.push_aux("UB".as_bytes(), rust_htslib::bam::record::Aux::String(&umi_seq_string)).expect("Error: unable to add barcode quality values to BAM record tags.");
+      record.push_aux("UY".as_bytes(), rust_htslib::bam::record::Aux::String("CCCCCCCC")).expect("Error: unable to add barcode quality values to BAM record tags.");
+
       bam_writer_vec[sample_index].write(&record).expect("Error: unable to write record to BAM file.");
     }
 
@@ -1279,7 +1268,6 @@ fn write_log_file(rt_barcode_id_map: &HashMap<Vec<u8>, BarcodeIdentifier>,
   let mut barcode_counter_map: HashMap<String, BarcodeCounter> = HashMap::new();
   for key in rt_barcode_id_map.keys() {
     let bi = rt_barcode_id_map.get(key).unwrap();
-    let well_index = bi.well_index;
     let well_name = bi.well_name.clone();
     if(!barcode_counter_map.contains_key(&well_name)) {
       let sample_index = well_index_to_sample_index_map[bi.well_index];
