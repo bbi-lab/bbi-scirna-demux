@@ -1328,6 +1328,8 @@ fn main() {
   let cl_options = set_cl_options().unwrap();
   let cl_arg = cl_options.get_matches();
 
+  println!("Add a test of the read 1 length. It must be at least 34 for recipe std_1 and 35 for std_2.");
+
   /*
   ** Get command line argument values.
   */
