@@ -47,18 +47,35 @@ if __name__ == '__main__':
 
   print('Fix me: wrong headers for p7_rows and p5_columns')
 
+  pcr_wells = False
   if(args.p7_wells != None and args.p5_wells != None):
     p7_spec = args.p7_wells
     p5_spec = args.p5_wells
+    pcr_wells = True
   elif(args.p7_rows != None and args.p5_columns != None):
     p7_spec = args.p7_rows
     p5_spec = args.p5_columns
+    pcr_wells = False
+  elif(args.p7_wells != None and args.p5_wells == None):
+    p7_spec = args.p7_wells 
+    p5_spec = 'none'
+    pcr_wells = True
+  elif(args.p7_wells == None and args.p5_wells != None):
+    p7_spec = 'none'
+    p5_spec = args.p5_wells 
+    pcr_wells = True
   else:
     p7_spec = 'none'
     p5_spec = 'none'
+    pcr_wells = False
 
   ofh = open(args.output, 'w')
-  print('rt_wells,sample_name,genome,p7_wells,p5_wells', file=ofh)
+
+  if(pcr_wells == True):
+    print('rt_wells,sample_name,genome,p7_wells,p5_wells', file=ofh)
+  else:
+    print('rt_wells,sample_name,genome,p7_rows,p5_columns', file=ofh)
+
   old_sample_name = ''
   with open(args.input, 'r') as fh:
     for line in fh:
