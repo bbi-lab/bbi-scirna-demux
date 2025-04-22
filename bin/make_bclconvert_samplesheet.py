@@ -27,8 +27,8 @@
 # 
 # 
 # Read rt_file, ligation_file, p7_file, and p5_file from json file.
-# If any are zero length strings, using the barcode files in the
-# pipeline repository. The paths are coded in this file.
+# If any are zero length strings, using the barcode files specified
+# as command line parameters.
 #
 # Functionality:
 #   o  p7 and p5 barcodes
