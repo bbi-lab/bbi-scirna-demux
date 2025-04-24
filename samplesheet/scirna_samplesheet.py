@@ -14,9 +14,10 @@
 #
 #   o  column_header_name_list = [ 'rt_wells', 'sample_name', 'genome', 'sample_flags', 'external_sample_name', 'tissue', 'wrap_group', 'lanes', 'hash_file', 'rt_file', 'ligation_file', 'p7_file', 'p5_file', 'library', 'process_group' ]
 #   o  columns_required_list = [ 'rt', 'p5', 'p7', 'sample_name', 'genome' ]
-#   o  check --lanes as optional parameter (uses -n <n> to define default)
-#   o  point out the different samples may have different rt_file, ligation_file,
-#      p7_file, p5_file, and hash_file values in case of different libraries
+#   o  check --lanes as optional parameter (uses -n <n> to define default)   (no)
+#   o  point out that different samples may have different rt_file,
+#      ligation_file, p7_file, p5_file, and hash_file values in case of
+#      different libraries
 #   o  check sample_flags description for completeness
 #        o  the flags are used to identify certain sample types, which receive
 #           type-specific processing.
@@ -60,7 +61,7 @@ Input (front-end) samplesheet format:
        o  wrap_group: the name of the group to which the results will
           be distributed. This information is used by the bbi-scirna-wrap
           script.
-       o  lanes: the flowcell lanes that have the sample
+       o  lanes: the flowcell lanes that have the sample (library)
        o  hash_file: the path to a text file that has the hash barcode
           sequences for a sciPlex experiment.
        o  rt_file: path to custom RT primer barcode file.
@@ -150,7 +151,6 @@ Input (front-end) samplesheet format:
        o  rows are given as single rows separated by commas
           examples:
             o  E,F,G
-            o  none
   o  p5 columns:
        o  u-titer plate p5 columns used for PCR reactions
        o  columns are given as single columns separated
@@ -226,18 +226,18 @@ Input (front-end) samplesheet format:
     o  these pipelines store reads in BAM files (unaligned and aligned).
     o  the general work flow is
          o  bcl-convert makes fastq files demultiplexed by PCR barcode pairs.
-            There is one fastq file for each valid PCR barcode pair (and the
-            fastq filenames have the p7 and p5 barcode sequence indices, as
-            well as the lane number, in them). These fastq files are used
-            internally only, and are not returned to the user, i.e.,
-            'published' by the Nextflow pipeline.
+            There is one pair of fastq files (fwd and rev reads) for each
+            valid PCR barcode pair (and the fastq filenames have the p7 and p5
+            barcode sequence indices, as well as the lane number, in them).
+            These fastq files are used internally only, and are not returned
+            to the user, i.e., 'published' by the Nextflow pipeline.
          o  the reads in these fastq files are demultiplexed by RT and ligation
             barcodes. The RT barcodes identify reads by sample. The resulting
             reads are written to unaligned BAM files where all reads in a BAM
-            file have the same lane and rt, p7, and p5 barcodes. The barcode
-            sequence indices and lane number are part of the BAM file name.
-            These BAM files are 'published' to the 'demux_out' directory.
-         o  these (sample, pcr pair, lane) BAM files are merged such that
+            file have the same lane and sample, p7, and p5 barcodes. The lane
+            number and PCR barcode sequence indices are part of the BAM file
+            name. These BAM files are 'published' to the 'demux_out' directory.
+         o  these (sample, lane, pcr pair) BAM files are merged such that
             reads in the output BAM file belong to the same sample,
             process_group, and have the same p7 and p5 barcodes. This means
             that BAM files whose reads have the same sample_name,
@@ -248,13 +248,12 @@ Input (front-end) samplesheet format:
             library, assign a distinct process_group value to the sample
             entries for each library. These merged BAM files are not
             'published'.
-         o  the unaligned BAM files are processed by bbduk.sh to trim off
+         o  the unaligned BAM files are processed by cutadapt to trim off
             adapter sequence. These trimmed BAM files are not published.
-         o  the trimmed read BAM files are aligned to the reference genome by
-            STARsolo and the aligned reads are assigned to cells. STARsolo
-            output files are for reads that have the same sample_name,
-            process_group, and p7 and p5 barcodes. These aligned read BAM
-            files are not 'published'.
+         o  the trimmed read BAM files are aligned to the reference genome and
+            assigned to cells by STARsolo. The STARsolo output files are for
+            reads that have the same sample_name, process_group, and p7 and
+            p5 barcodes. These aligned read BAM files are not 'published'.
          o  these (sample, process_group, pcr pair) aligned output files are
             merged such that all reads with the same sample_name and
             process_group, are written to the same output BAM file. This means
@@ -267,7 +266,7 @@ Input (front-end) samplesheet format:
             this stage. The merged BAM, count matrix, and statistics files
             are 'published' to the 'analyze_out' directory.
          o  a cds file and umap.png file are made for each sample,
-            process_group count matrix.
+            process_group expression count matrix.
          o  when the hash_file value is set for a sample, the untrimmed BAM
             files are processed to find candidate hash reads and a cds is
             made with the hash read information.
@@ -2292,7 +2291,6 @@ if __name__ == '__main__':
   print('  *  where lanes element is used, expand and contract in\n     order to normalize entries (in case a lane set is described\n     with different but equivalent strings)', file=sys.stderr)
   print('  *  test the two modifications above', file=sys.stderr)
   print('  o  update documentation/help notes', file=sys.stderr) 
-  print('  o  make sample names distinct in cases where there are\n     different libraries of a sample (in different lanes)', file=sys.stderr)
   print('  o  add a command line option to dump diagnostic information', file=sys.stderr)
   print('================================================================================', file=sys.stderr)
   print('', file=sys.stderr)

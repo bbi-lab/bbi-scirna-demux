@@ -27,8 +27,8 @@
 # 
 # 
 # Read rt_file, ligation_file, p7_file, and p5_file from json file.
-# If any are zero length strings, using the barcode files in the
-# pipeline repository. The paths are coded in this file.
+# If any are zero length strings, using the barcode files specified
+# as command line parameters.
 #
 # Functionality:
 #   o  p7 and p5 barcodes
@@ -48,6 +48,18 @@
 #        o  p5 seq (zero length string denotes dark)
 #        o  'sample_id' consists of p7 and p5 indices concatenated (0 index denotes dark)
 #        o  either p7 or p5 may be 'dark' but not both
+#
+# Tests:
+#   o  tested with different p7 and p5 files for different lanes (2 samples in 2 lanes total)
+#   o  tested with
+#         sample_name,genome,rt_wells,p7_wells,p5_wells,...
+#         sample.1,mouse,"P1-A01:P1-A04",P02-A02,P02-B01,...
+#         sample.2,mouse,"P1-A01:P1-A04",P01-A12,P01-H01,...
+#   o  results:
+#        o indices in the samplesheet.json are correct
+#        o indices in bclconvert samplesheet names are correct
+#        o barcode sequences are correct
+#
 
 import sys
 import json
@@ -387,18 +399,13 @@ def dump_pcr_well_barcodes(distinct_tuples, barcode_seq_dict):
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='A program to make bcl-convert samplesheet file.')
-  parser.add_argument('-i', '--input', required=False, default=None, help='Input JSON samplesheet filename (required string).')
-  parser.add_argument('-o', '--output', required=False, default=None, help='Output bcl-convert samplesheet filename (required string).')
-  parser.add_argument('-7', '--p7_file', required=False, default=None, help='P7 barcode file path.')
-  parser.add_argument('-5', '--p5_file', required=False, default=None, help='P5 barcode file path.')
+  parser.add_argument('-i', '--input', required=True, default=None, help='Input JSON samplesheet filename (required string).')
+  parser.add_argument('-o', '--output', required=True, default=None, help='Output bcl-convert samplesheet filename (required string).')
+  parser.add_argument('-7', '--p7_file', required=True, default=None, help='P7 barcode file path.')
+  parser.add_argument('-5', '--p5_file', required=True, default=None, help='P5 barcode file path.')
   parser.add_argument('-r', '--p5_rcmp', required=True, default=None, help='P5 reverse complement (bool).')
-  parser.add_argument('-v', '--version', required=False, default=None, help='Write version string to stdout.')
+  parser.add_argument('-v', '--version', action='version', version=program_version)
   args = parser.parse_args()
-
-  # Write versions.
-  if( args.version ):
-    print( 'Program version: %s' % ( program_version ) )
-    sys.exit( 0 ) 
 
   #
   # Make PCR barcode well to index dictionaries.
@@ -440,5 +447,5 @@ if __name__ == '__main__':
   #
   make_bclconvert_samplesheet(distinct_tuples, p7_index_zero, p5_index_zero, barcode_seq_dict, args.output)
 
-  dump_pcr_well_barcodes(distinct_tuples, barcode_seq_dict)
+#  dump_pcr_well_barcodes(distinct_tuples, barcode_seq_dict)
 
