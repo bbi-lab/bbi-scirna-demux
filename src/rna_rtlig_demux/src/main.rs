@@ -458,16 +458,18 @@ fn make_barcode_id_map(sample_map_vec: &Vec<SampleMap>, barcode_type: &str, defa
   */
   if(barcode_type == "rt_file") {
     for sample_map in sample_map_vec.iter() {
-      if(sample_map.rt_file.len() > 0) {
-        file_name = sample_map.rt_file.clone();
+      let tstr = sample_map.rt_file.trim().to_string();
+      if(tstr.len() > 0) {
+        file_name = tstr;
         break
       }
     }
   }
   else if(barcode_type == "ligation_file") {
     for sample_map in sample_map_vec.iter() {
-      if(sample_map.ligation_file.len() > 0) {
-        file_name = sample_map.ligation_file.clone();
+      let tstr = sample_map.ligation_file.trim().to_string();
+      if(tstr.len() > 0) {
+        file_name = tstr;
         break
       }
     }
@@ -476,7 +478,6 @@ fn make_barcode_id_map(sample_map_vec: &Vec<SampleMap>, barcode_type: &str, defa
     Err("Error: make_barcode_id_map: unrecognized barcode_type value.")?;
   }
 
-  println!("file len: {}", file_name.len());
   if(file_name.len() == 0) {
     file_name = default_file.to_string();
   }
@@ -506,7 +507,6 @@ fn make_barcode_id_map(sample_map_vec: &Vec<SampleMap>, barcode_type: &str, defa
   let mut barcode_id_map: HashMap<Vec<u8>, BarcodeIdentifier> = HashMap::new();
 
   for num_mismatch in 0..(max_num_mismatch+1) {
-    println!("num mismatch: {}", num_mismatch);
     let mut corrected_flag: bool = false;
     if(num_mismatch > 0) {
       corrected_flag = true;
@@ -618,7 +618,7 @@ fn make_index_maps(sample_map_vec: &Vec<SampleMap>,
   ** Find number of distinct sample names.
   */
   let num_samples: usize = sample_indices_map.keys().len();
-  println!("num_samples: {}", num_samples);
+  println!("num samples: {}", num_samples);
 
   /*
   ** Declare and initialize well index to sample index map.
@@ -909,6 +909,15 @@ fn process_reads(fastq1_file: &str,
   else {
     Err("Error: unrecognized recipe value.")?;
   }
+
+  println!("recipe: {}", recipe);
+  println!("  lig_9_slice: {:#?}", lig_9_slice);
+  println!("  umi_9_slice: {:#?}", umi_9_slice);
+  println!("  rt_9_slice: {:#?}", rt_9_slice);
+  println!("");
+  println!("  lig_10_slice: {:#?}", lig_10_slice);
+  println!("  umi_10_slice: {:#?}", umi_10_slice);
+  println!("  rt_10_slice: {:#?}", rt_10_slice);
 
   let mut records_written_index = 0;
 

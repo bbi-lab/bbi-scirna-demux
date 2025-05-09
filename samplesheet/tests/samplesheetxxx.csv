@@ -1,0 +1,2 @@
+sample_name,genome,rt_wells,p7_wells,p5_wells,external_sample_name,tissue,wrap_group,hash_file,lanes,sample_flags,p7_file,p5_file
+sample.1,mouse,"P1-A01:P1-A04","P01-A01,P02-B02","P01-A01,P02-B01",extsample.1,brain,Smith,,1:4,B,"/net/bbi/vol1/data/bge/bbi/tests/p7a.txt","/net/bbi/vol1/data/bge/bbi/tests/p5a.txt"
