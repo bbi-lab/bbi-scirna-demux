@@ -237,7 +237,7 @@ Input (front-end) samplesheet format:
             file have the same lane and sample, p7, and p5 barcodes. The lane
             number and PCR barcode sequence indices are part of the BAM file
             name. The BAM file names have the form
-              <sample_name>-<lane_number>_<p7_index>_<p5_index>-L<lane_index>
+              <sample_name>-<lane_number>_<p7_index>_<p5_index>-L<lane_index>.bam
             They are 'published' to the 'demux_out' directory.
          o  demultiplexed BAM files are merged by lanes, as required. This
             gathers reads by sample, PCR pair, and process_group. Their names
@@ -250,7 +250,7 @@ Input (front-end) samplesheet format:
             library, assign a distinct process_group value to the sample
             rows for each library.
          o  the unaligned BAM files are processed by cutadapt to trim off
-            adapter sequence. The BAM file names have the form
+            adapter sequence. The resulting BAM file names have the form
               <sample_name>-<process_group>_<p7_index>_<p5_index>.trimmed.bam
             These BAM files are not published. 
          o  the trimmed read BAM files are aligned to the reference genome and
@@ -264,7 +264,7 @@ Input (front-end) samplesheet format:
             'analyze_out' directory.
             The BAM file names have the form
               <sample_name>-<process_group>.aligned.bam
-         o  a cds file and umap.png file are made for each sample,
+         o  a cds file and umap.png file are made for each sample and
             process_group expression count matrix. These files are 'published'
             to the 'analyze_out' directory.
          o  when the hash_file value is set for a sample, the untrimmed BAM
