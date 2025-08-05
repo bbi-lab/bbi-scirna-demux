@@ -45,7 +45,7 @@ if __name__ == '__main__':
   parser.add_argument('-v', '--version', required=False, default=None, help='Write version string to stdout.')
   args = parser.parse_args()
 
-  print('Fix me: wrong headers for p7_rows and p5_columns')
+  # print('Fix me: wrong headers for p7_rows and p5_columns')
 
   pcr_wells = False
   if(args.p7_wells != None and args.p5_wells != None):
