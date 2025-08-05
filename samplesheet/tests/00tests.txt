@@ -18,8 +18,8 @@ note: compare index values to table
 
 o samplesheet15.csv       p7 indices: out of order wells
 o samplesheet16.csv       p7 indices: out of order rows
-o samplesheet17.csv       p7 indices: lower case well row specifier
-o samplesheet18.csv       p7 indices: upper case well row specifier
+o samplesheet17.csv       p7 indices: lower case well specifier
+o samplesheet18.csv       p7 indices: upper case well specifier
 o samplesheet19.csv       p7 indices: lower case row specifier
 o samplesheet20.csv       p7 indices: upper case row specifier
 o samplesheet21.csv       p7 indices: row range
@@ -31,6 +31,7 @@ o samplesheet26.csv       p7 indices: multiple rows
 o samplesheet27.csv       p7 indices: wrong row group separator
 o samplesheet28.csv       p7 indices: '0' (none) row
 o samplesheet29.csv       p7 indices: '0' (none) well
+o samplesheet29_1.csv     p7 indices: well with plate specifier
 note: compare index values to table
 
 o samplesheet30.csv       p5 indices: out of order wells
@@ -46,6 +47,7 @@ o samplesheet39.csv       p5 indices: multiple col
 o samplesheet40.csv       p5 indices: wrong column group separator
 o samplesheet41.csv       p5 indices: '0' (none) col
 o samplesheet42.csv       p5 indices: '0' (none) well
+o samplesheet42_1.csv     p5 indices: well with plate specifier
 note: compare index values to table
 
 o samplesheet43.csv       p7 and p5 indices: split csv rows for multiple row and column combinations
@@ -55,7 +57,7 @@ o samplesheet46.csv       p7 and p5 indices: '0' (none) p7 wells and '0' (none) 
 
 o samplesheet47.csv       sample name: does not begin with alphanumeric character
 o samplesheet48.csv       sample name: name edits (clean-up)
-o ssamplesheet49.csv      sample name: post-edit name degeneracy check
+o samplesheet49.csv       sample name: post-edit name degeneracy check
 
 o samplesheet50.csv       genome name: in known genome list
 o samplesheet51.csv       genome name: not in known genome list
@@ -76,7 +78,7 @@ o samplesheet62.csv       wrap group name: bad name (alphanumeric ._-)
 o samplesheet63.csv       wrap group name: listed in run report?
 
 o samplesheet64.csv       lanes: no column
-o samplesheet65.csv       lanes: empty cell
+o samplesheet65.csv       lanes: error empty cell and column header exists
 o samplesheet66.csv       lanes: single lane
 o samplesheet67.csv       lanes: multiple single lanes
 o samplesheet68.csv       lanes: lane range
@@ -86,6 +88,7 @@ o samplesheet70.csv       lanes: listed in run report? (intentionally not listed
 o samplesheet71.csv       hash file: no column
 o samplesheet72.csv       hash file: empty cell
 o samplesheet73.csv       hash file: '/home/me/hashes.txt'
+o -
 o samplesheet75.csv       hash file: listed in run report? (intentionally not listed in run report)
 
 o samplesheet76.csv       column order: order insensitive
@@ -103,8 +106,10 @@ o samplesheet85.csv       sample_flags: listed in run report?
 
 o samplesheet86.csv       rt_file: column exists and cell has path
 o samplesheet87.csv       ligation_file: column exists and cell has path
-o samplesheet88.csv       p7_file: column exists and cell has path
-o samplesheet89.csv       p5_file: column exists and cell has path
+o samplesheet88.csv       p7_file: column exists and cell has path; must be one p7 file for lane
+o samplesheet88_1.csv     p7_file: column exists and cell has path
+o samplesheet89.csv       p5_file: column exists and cell has path; must be one p5 file for lane
+o samplesheet89_1.csv     p5_file: column exists and cell has path
 
 o samplesheet90.csv       library: column exists and cell has content
 
@@ -130,6 +135,8 @@ o samplesheet116.csv      process_group: error: not integer
 o samplesheet117.csv      process_group: error: two integers in cell
 
 o samplesheet118.csv      process_group: one group and one sample with two different lanes
+
+o samplesheet120.csv      process_group: two lanes and three process groups
 
 
 ** additional tests

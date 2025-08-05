@@ -3,14 +3,6 @@
 #
 # TODO:
 #   o  add process_group documentation
-#        o  define it
-#        o  explain rationale for adding it
-#        o  show examples
-#        o  explain file name formats:
-#             o  demuxed filename
-#             o  merged demuxed filename
-#   o  compare documentation to functionality
-#
 #
 #   o  column_header_name_list = [ 'rt_wells', 'sample_name', 'genome', 'sample_flags', 'external_sample_name', 'tissue', 'wrap_group', 'lanes', 'hash_file', 'rt_file', 'ligation_file', 'p7_file', 'p5_file', 'library', 'process_group' ]
 #   o  columns_required_list = [ 'rt', 'p5', 'p7', 'sample_name', 'genome' ]
@@ -179,8 +171,8 @@ Input (front-end) samplesheet format:
        o  given as one or more lanes or ranges of lanes using a colon, ':',
           to specify lane ranges, and commas, ',', to separate lanes or lane
           ranges. The lanes column may be omitted in which case all lanes will
-          be used for all samples. If the lane column is included, all cells
-          must be set.
+          be used for all samples. If the lane column is included, all column
+          cells must have values.
           examples:
             o  1:3
             o  1,3,5:8
@@ -195,9 +187,24 @@ Input (front-end) samplesheet format:
           are identified by a 'b', and the keyhole experiment is identified by
           'k'. The samples with capitalized letters are used in the dashboard
           sentinel, barnyard, and keyhole reports. Cells may be empty. 
-  o  rt_file, ligation_file, p7_file, p5_file:
-       o  paths to custom barcode files. The path is not checked for validity.
-          Empty cells denote use of the default barcode file.
+  o  rt_file:
+       o  paths to custom rt barcode file. The path is not checked for
+          validity. Empty cells denote use of the default barcode file.
+       o  samples in a process_group must have the same rt_file.
+  o  ligation_file:
+       o  paths to custom ligation barcode file. The path is not checked for
+          validity. Empty cells denote use of the default barcode file.
+       o  samples in a process_group must have the same ligation_file.
+  o  p7_file:
+       o  paths to custom p7 barcode file. The path is not checked for
+          validity. Empty cells denote use of the default barcode file.
+       o  samples in a process_group must have the same p7_file.
+       o  samples in a lane must have the same p7_file.
+  o  p5_file:
+       o  paths to custom p5 barcode file. The path is not checked for
+          validity. Empty cells denote use of the default barcode file.
+       o  samples in a process_group must have the same p5_file.
+       o  samples in a lane must have the same p5_file.
   o  library:
        o  library an arbitrary string that can used to identify the sequencing
           library
@@ -207,13 +214,6 @@ Input (front-end) samplesheet format:
        o  the samples in the first group are given the value 1
        o  samples in additional groups are given successive integer
           values.
-
-  Example samplesheet file:
-
-  sample_name,genome,rt_wells,p7_wells,p5_wells,external_sample_name,tissue,wrap_group,hash_file,lanes,sample_flags
-  sample.1,mouse,"P01-A01:P01-A02","C01:C12","A11:H11",extsample.1,brain,Smith,,"1:3,5",
-  sample.2,mouse,"P01-A03:P01-A04","C01:C12","A11:H11",extsample.2,brain,Smith,,"1:4",
-  Barnyard,barnyard,"P01-A05:P01-A06","C01:C12","A11:H11",,barnyard,BBI,,"1:4",B
 
   Notes:
     o  the well value sets are enclosed in quotes in this example because the
@@ -236,37 +236,37 @@ Input (front-end) samplesheet format:
             reads are written to unaligned BAM files where all reads in a BAM
             file have the same lane and sample, p7, and p5 barcodes. The lane
             number and PCR barcode sequence indices are part of the BAM file
-            name. These BAM files are 'published' to the 'demux_out' directory.
-         o  these (sample, lane, pcr pair) BAM files are merged such that
-            reads in the output BAM file belong to the same sample,
-            process_group, and have the same p7 and p5 barcodes. This means
-            that BAM files whose reads have the same sample_name,
-            process_group, p7 barcode, and p5 barcode, but different lanes,
-            are merged. If you have the same sample, with the same sample_name,
-            in multiple libraries, each library run in a different lane, and
+            name. The BAM file names have the form
+              <sample_name>-<lane_number>_<p7_index>_<p5_index>-L<lane_index>.bam
+            They are 'published' to the 'demux_out' directory.
+         o  demultiplexed BAM files are merged by lanes, as required. This
+            gathers reads by sample, PCR pair, and process_group. Their names
+            have the form
+              <sample_name>-<process_group>_<p7_index>_<p5_index>.merged.bam
+            They are not published.
+         o  if you have the same sample, with the same sample_name, in
+            multiple libraries, each library run in a different lane(s), and
             you need the pipeline to process separately the reads from each
             library, assign a distinct process_group value to the sample
-            entries for each library. These merged BAM files are not
-            'published'.
+            rows for each library.
          o  the unaligned BAM files are processed by cutadapt to trim off
-            adapter sequence. These trimmed BAM files are not published.
+            adapter sequence. The resulting BAM file names have the form
+              <sample_name>-<process_group>_<p7_index>_<p5_index>.trimmed.bam
+            These BAM files are not published. 
          o  the trimmed read BAM files are aligned to the reference genome and
             assigned to cells by STARsolo. The STARsolo output files are for
             reads that have the same sample_name, process_group, and p7 and
             p5 barcodes. These aligned read BAM files are not 'published'.
          o  these (sample, process_group, pcr pair) aligned output files are
             merged such that all reads with the same sample_name and
-            process_group, are written to the same output BAM file. This means
-            that BAM files with the same sample_name and process_group, but
-            different p7 and/or p5 barcodes, are merged. If you have samples
-            in a lane that have the same sample_name but are from different
-            libraries, where these samples are distinguished using different
-            p7 and p5 barcode combinations, you must assign the samples
-            distinct process_group values to avoid merging their reads by
-            this stage. The merged BAM, count matrix, and statistics files
-            are 'published' to the 'analyze_out' directory.
-         o  a cds file and umap.png file are made for each sample,
-            process_group expression count matrix.
+            process_group are written to the same output BAM file. The merged
+            BAM, count matrix, and statistics files are 'published' to the
+            'analyze_out' directory.
+            The BAM file names have the form
+              <sample_name>-<process_group>.aligned.bam
+         o  a cds file and umap.png file are made for each sample and
+            process_group expression count matrix. These files are 'published'
+            to the 'analyze_out' directory.
          o  when the hash_file value is set for a sample, the untrimmed BAM
             files are processed to find candidate hash reads and a cds is
             made with the hash read information.
@@ -301,6 +301,48 @@ options:
   -d, --documentation   Display documentation and exit (optional flag).
   -v, --version         Give program and JSON output file versions and exit
                         (optional flag).
+
+
+  -- Example simple samplesheet file:
+
+  Notes:
+    o  all lanes have the same library (one process_group)
+    o  required columns only
+
+  sample_name,genome,rt_wells,p7_wells,p5_wells
+  sample.1,mouse,"P01-A01:P01-A02","C01:C12","A11:H11"
+  sample.2,mouse,"P01-A03:P01-A04","C01:C12","A11:H11"
+  Barnyard,barnyard,"P01-A05:P01-A06","C01:C12","A11:H11"
+
+
+  -- Example multi-library samplesheet file:
+
+  Notes: 
+    o  two libraries in two lane sets (two process_groups)
+    o  the sample names in the two libraries are the same
+    o  required columns only
+
+  sample_name,genome,rt_wells,p7_wells,p5_wells,lanes,process_group
+  my_sample,mouse,"P01-A01:P01-A02","C01:C12","A11:H11",1,1
+  my_sample,mouse,"P01-A03:P01-A04","C01:C12","A11:H11",2,2
+  Barnyard,barnyard,"P01-A05:P01-A06","C01:C12","A11:H11",1,1
+  Barnyard,barnyard,"P01-A05:P01-A06","C01:C12","A11:H11",2,2
+
+  -- Example complex multi-library samplesheet file with distinct
+     lanes and PCR pairs to distinguish samples in process_groups
+
+  Notes:
+    o  three libraries in two lane sets (three process_groups)
+    o  the sample names in the three libraries are the same
+    o  required columns only
+
+  sample_name,genome,rt_wells,p7_wells,p5_wells,lanes,process_group
+  my_sample,mouse,"P01-A01:P01-A02","C01:C12","A11:H11",1,1
+  my_sample,mouse,"P01-A03:P01-A04","C01:C12","A11:H11",2,2
+  my_sample,mouse,"P01-A03:P01-A04","C01:C12","A12:H12",1:2,3
+  Barnyard,barnyard,"P01-A05:P01-A06","C01:C12","A11:H11",1,1
+  Barnyard,barnyard,"P01-A05:P01-A06","C01:C12","A11:H11",2,2
+  Barnyard,barnyard,"P01-A05:P01-A06","C01:C12","A12:H12",1:2,3
 """
 
 #
@@ -1010,6 +1052,7 @@ def check_rows( column_name_list, csv_rows ):
       if( len( cell ) > 0 or ( column_name_list[icol]['type'] in column_allow_empty_cell ) ):
         row_elements_out.append( cell )
       else:
+        print( 'Error: unexpected empty cell in column \'%s\'' % (column_name_list[icol]['type']))
         num_empty += 1 
     # Save the row if there are no invalid empty cells.
     if( num_empty == 0 ):
@@ -1296,7 +1339,7 @@ def check_barcode_files( column_name_list, samplesheet_row_list ):
 
 
 #
-# Check lane- and sample-oriented value consisteny.
+# Check lane- and sample-oriented value consistency.
 # Notes:
 #   o  use a multilayer dictionary that looks like
 #
@@ -1389,7 +1432,7 @@ def check_lane_sample_consistency( column_name_list, samplesheet_row_list ):
   # Lane tests.
   print('  Check lane-oriented value consistency...')
   error_flag_1 = False
-  lanes_test_list = ['rt_file', 'ligation_file', 'p7_file', 'p5_file', 'library']
+  lanes_test_list = ['p7_file', 'p5_file']
   for lanes in counter.keys():
     for lanes_test in lanes_test_list:
       if(not lanes_test in row_value_dict.keys()):
@@ -1753,6 +1796,8 @@ def dump_row_out_list( row_out_list ):
     print( '  rt_index_list: %s  wells: %s' % ( make_index_string( row_out['rt_index_list'] ), index_string_to_well_string( make_index_string( row_out['rt_index_list'] ), across_row_first=True, show_plate=True ) ) )
     print( '  p7_index_list: %s  wells: %s' % ( make_index_string( row_out['p7_index_list'] ), index_string_to_well_string( make_index_string( row_out['p7_index_list'] ), across_row_first=True, show_plate=False ) ) )
     print( '  p5_index_list: %s  wells: %s' % ( make_index_string( row_out['p5_index_list'] ), index_string_to_well_string( make_index_string( row_out['p5_index_list'] ), across_row_first=False, show_plate=False ) ) )
+    print( '  lanes:  %s' % ( make_index_string( row_out['lanes']) ) )
+    print( '  process group: %s' % ( row_out['process_group'] ) )
     print( '  genome: %s' % ( row_out['genome'] ) )
   return( 0 )
 
@@ -1845,7 +1890,7 @@ def get_pcr_wells( column_name_list, samplesheet_row_list ):
       value_range = re.sub( r'\s', '', value_range )
       if( mobj := re.match( r'([pP][0]?([1-4*])[-])?([a-hA-H])([0]?[1-9][0-2]?)([:]([pP][0]?([1-4*])[-])?([a-hA-H])([0]?[1-9][0-2]?))?$', value_range.strip() ) ):
         # Assume that the well-range strings were checked earlier in parse_wells() call so
-        # those tests are omitted here. Also, this is PCR for which there is a single plate=1.
+        # those tests are omitted here.
         # first well
         row1 = mobj.group( 3 )
         col1 = int( mobj.group( 4 ) )
@@ -1876,7 +1921,7 @@ def get_pcr_wells( column_name_list, samplesheet_row_list ):
       value_range = re.sub( r'\s', '', value_range )
       if( mobj := re.match( r'([pP][0]?([1-4*])[-])?([a-hA-H])([0]?[1-9][0-2]?)([:]([pP][0]?([1-4*])[-])?([a-hA-H])([0]?[1-9][0-2]?))?$', value_range.strip() ) ):
         # Assume that the well-range strings were checked earlier in parse_wells() call so
-        # those tests are omitted here. Also, this is PCR for which there is a single plate=1.
+        # those tests are omitted here.
         # first well
         row1 = mobj.group( 3 )
         col1 = int( mobj.group( 4 ) )
@@ -2287,10 +2332,6 @@ if __name__ == '__main__':
   #
   print('================================================================================', file=sys.stderr)
   print('Need to do:', file=sys.stderr)
-  print('  *  two points: (a) if there is no \'lanes\' column set the lanes value in the JSON file to 1 to <number_lanes> (1-<number_lanes>) and (b) when the lanes column exists, disallow empty cells in the column.', file=sys.stderr)
-  print('  *  where lanes element is used, expand and contract in\n     order to normalize entries (in case a lane set is described\n     with different but equivalent strings)', file=sys.stderr)
-  print('  *  test the two modifications above', file=sys.stderr)
-  print('  o  update documentation/help notes', file=sys.stderr) 
   print('  o  add a command line option to dump diagnostic information', file=sys.stderr)
   print('================================================================================', file=sys.stderr)
   print('', file=sys.stderr)
