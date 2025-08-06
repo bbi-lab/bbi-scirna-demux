@@ -88,7 +88,7 @@ o samplesheet70.csv       lanes: listed in run report? (intentionally not listed
 o samplesheet71.csv       hash file: no column
 o samplesheet72.csv       hash file: empty cell
 o samplesheet73.csv       hash file: '/home/me/hashes.txt'
-o -
+o samplesheet74.csv       hash file: test for bbi-scirna-analyze/bin/make_process_hashes_json.py
 o samplesheet75.csv       hash file: listed in run report? (intentionally not listed in run report)
 
 o samplesheet76.csv       column order: order insensitive
