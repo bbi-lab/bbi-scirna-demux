@@ -191,10 +191,12 @@ Input (front-end) samplesheet format:
        o  paths to custom rt barcode file. The path is not checked for
           validity. Empty cells denote use of the default barcode file.
        o  samples in a process_group must have the same rt_file.
+       o  samples in a lane must have the same rt_file.
   o  ligation_file:
        o  paths to custom ligation barcode file. The path is not checked for
           validity. Empty cells denote use of the default barcode file.
        o  samples in a process_group must have the same ligation_file.
+       o  samples in a lane must have the same ligation_file.
   o  p7_file:
        o  paths to custom p7 barcode file. The path is not checked for
           validity. Empty cells denote use of the default barcode file.
@@ -768,7 +770,7 @@ def check_index_list( index_type, index_list, element_coordinates = [ None, None
 #
 # Make an index list from a string of index ranges.
 #
-index_range_re_pattern = r'([[0-9]+)([-]([0-9]?))?$'
+index_range_re_pattern = r'([0-9]+)([-]([0-9]?))?$'
 def make_index_list( index_string ):
   index_list = []
   for index_range in index_string.split( ',' ):
@@ -2324,7 +2326,7 @@ if __name__ == '__main__':
   parser.add_argument('-n', '--number_lanes', type=int, required=False, default=None, help='Number of flowcell lanes (required integer).')
   parser.add_argument('-e', '--template', required=False, action='store_true', help='Write template samplesheet file (\'samplesheet.template.csv\') with standard column formats and exit (optional flag).')
   parser.add_argument('-d', '--documentation', required=False, action='store_true', help='Display documentation and exit (optional flag).')
-  parser.add_argument('-v', '--version', required=False, action='store_true', help='Give program and JSON output file versions and exit (optional flag).')
+  parser.add_argument('-v', '--version', action='version', version=program_version)
   args = parser.parse_args()
 
   #
@@ -2340,12 +2342,6 @@ if __name__ == '__main__':
   # Write documentation.
   if( args.documentation ):
     display_documentation()
-    sys.exit( 0 )
-
-  # Write versions.
-  if( args.version ):
-    print( 'Program version: %s' % ( program_version ) )
-    print( 'JSON output file  version: %s' % ( json_file_version ) )
     sys.exit( 0 )
 
   # Write samplesheet template file.
