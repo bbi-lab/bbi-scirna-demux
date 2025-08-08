@@ -770,7 +770,7 @@ def check_index_list( index_type, index_list, element_coordinates = [ None, None
 #
 # Make an index list from a string of index ranges.
 #
-index_range_re_pattern = r'([0-9]+)([-]([0-9]?))?$'
+index_range_re_pattern = r'([0-9]+)([-]([0-9]+))?$'
 def make_index_list( index_string ):
   index_list = []
   for index_range in index_string.split( ',' ):

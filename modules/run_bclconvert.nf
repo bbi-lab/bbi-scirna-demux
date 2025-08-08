@@ -12,8 +12,8 @@ process run_bclconvert {
 
   script:
   """
-  module load modules modules-init modules-gs
-  module load bcl-convert/4.2.7
+  # bash watch for errors
+  set -ueo pipefail
 
   #
   # Infer the p5 barcode orientation from the flowcell RunParameters.xml file.

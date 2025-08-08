@@ -20,6 +20,9 @@ process run_rna_rtlig_demux {
 
   script:
   """
+  # bash watch for errors
+  set -ueo pipefail
+
   $workflow.projectDir/bin/rna_rtlig_demux -1 $fastq_read1 \
                                            -2 $fastq_read2 \
                                            -s $samplesheet_file \

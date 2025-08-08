@@ -42,6 +42,7 @@ ligation_barcode_file_default = channel.value(params.ligation_barcode_file_defau
 ** Import modules after defining params.* so that
 ** the parameters are accessible in the modules.
 */
+include {run_check_samplesheet} from './modules/run_check_samplesheet.nf'
 include { run_bclconvert } from './modules/run_bclconvert.nf'
 include { run_rna_rtlig_demux } from './modules/run_rna_rtlig_demux.nf'
 
@@ -50,6 +51,7 @@ include { run_rna_rtlig_demux } from './modules/run_rna_rtlig_demux.nf'
 ** Run pipeline.
 */
 workflow {
+  run_check_samplesheet(samplesheet_file)
   run_bclconvert(samplesheet_file, illumina_run_dir, p7_barcode_file_default, p5_barcode_file_default)
   run_bclconvert.out.flatMap{ make_pairwise_fastq_bclconvert(it) }.set{fastq_pairs}
   run_rna_rtlig_demux(fastq_pairs, samplesheet_file, rt_barcode_file_default, ligation_barcode_file_default)

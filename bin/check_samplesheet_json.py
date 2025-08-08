@@ -90,7 +90,7 @@ def make_distinct_tuples(pcr_data_list):
 #
 # Make an index list from a string of index ranges.
 #
-index_range_re_pattern = r'([0-9]+)([-]([0-9]?))?$'
+index_range_re_pattern = r'([0-9]+)([-]([0-9]+))?$'
 def make_index_list( index_string ):
   index_list = []
   for index_range in index_string.split( ',' ):
@@ -232,37 +232,62 @@ def write_sample_index_dict(sample_index_dict, prefix):
 #
 # Strategy
 #   o  form strings that store the information
+#   o  expand the lanes, rt, ligation, p7, and p5 indices to check for intersections
 #   o  sort the strings
 #   o  check for duplicate strings
 #
 def check_for_duplicate_combinations(sample_index_list):
   error_flag = False
-  # Use sample_index_dict_lookup for reporting duplicates.
-  sample_index_dict_lookup = dict()
+  # Use sample_index_subdict_lookup for reporting duplicates.
+  sample_index_subdict_lookup = dict()
   entry_list = list()
   for sample_index_dict in sample_index_list:
-    entry_string = '%s|%s|%s' % (sample_index_dict['process_group'], 
-                                       sample_index_dict['lanes'],
-                                       sample_index_dict['ranges'])
-    entry_list.append(entry_string)
-    if(not entry_string in sample_index_dict_lookup):
-      sample_index_dict_lookup[entry_string] = list()
-    sample_index_dict_lookup[entry_string].append(sample_index_dict)
-    
-  entry_list.sort
-  dup_list = list()
+    process_group = sample_index_dict['process_group']
+    (rt_indices, p7_indices, p5_indices) = sample_index_dict['ranges'].split(':')
+    sample_index_subdict = {'sample_id' : sample_index_dict['sample_id'],
+                            'genome' : sample_index_dict['genome'],
+                            'process_group' : process_group,
+                            'lanes' : sample_index_dict['lanes'],
+                            'ranges' : sample_index_dict['ranges'],
+                            'hash_file' : sample_index_dict['hash_file'],
+                            'rt_file' : sample_index_dict['rt_file'],
+                            'ligation_file' : sample_index_dict['ligation_file'],
+                            'p7_file' : sample_index_dict['p7_file'],
+                            'p5_file' : sample_index_dict['p5_file']}
+    lanes_list = make_index_list(sample_index_dict['lanes'])
+    rt_index_list = make_index_list(rt_indices)
+    p7_index_list = make_index_list(p7_indices)
+    p5_index_list = make_index_list(p5_indices)
+    for lane in lanes_list:
+      for rt_index in rt_index_list:
+        for p7_index in p7_index_list:
+          for p5_index in p5_index_list:
+            entry_string = '%s|%s|%s|%s|%s' % (process_group, 
+                                               lane,
+                                               rt_index,
+                                               p7_index,
+                                               p5_index)
+            entry_list.append(entry_string)
+            if(not entry_string in sample_index_subdict_lookup):
+              sample_index_subdict_lookup[entry_string] = list()
+            sample_index_subdict_lookup[entry_string].append(sample_index_subdict)
+  entry_list.sort()
+  dup_entry_list = list()
   for i in range(1,len(entry_list)):
     if(entry_list[i] == entry_list[i-1]):
-      if(not entry_list[i] in dup_list):
-        dup_list.append(entry_list[i])
-  if(len(dup_list) != 0):
+      if(not entry_list[i] in dup_entry_list):
+        dup_entry_list.append(entry_list[i])
+  if(len(dup_entry_list) != 0):
     error_flag = True
+    dup_subdict_list = []
+    for dup_entry in dup_entry_list:
+      for subdict in sample_index_subdict_lookup[dup_entry]:
+        if(not subdict in dup_subdict_list):
+          dup_subdict_list.append(subdict)
     print('Error: duplicate combination of process_group, lanes, rt_indices, p7_indices, and p5_indices')
-    for entry_string in dup_list:
-      dup_index_dict_list = sample_index_dict_lookup[entry_string]
-      for dup_index_dict in dup_index_dict_list:
-        write_sample_index_dict(dup_index_dict, '  ')
-        print('  --')
+    for subdict in dup_subdict_list:
+      write_sample_index_dict(subdict, '  ')
+      print('  --')
   return(error_flag)
 
 
