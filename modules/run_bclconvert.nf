@@ -6,6 +6,7 @@ process run_bclconvert {
     val illumina_run
     val p7_barcode_file
     val p5_barcode_file
+    val p5_revcmp
 
   output:
     path "fastqs_bclconvert/*.fastq.gz"
@@ -16,16 +17,10 @@ process run_bclconvert {
   set -ueo pipefail
 
   #
-  # Infer the p5 barcode orientation from the flowcell RunParameters.xml file.
-  #
-  # I believe that bcl-convert manages the P5 orientation.
-  #
-  RCMP='False'
-
-  #
   # Run bcl-convert.
   #
-  $workflow.projectDir/bin/make_bclconvert_samplesheet.py -i $samplesheet_json -o samplesheet_bclconvert.csv -7 $p7_barcode_file -5 $p5_barcode_file --p5_rcmp \$RCMP
+  $workflow.projectDir/bin/make_bclconvert_samplesheet.py -i $samplesheet_json -o samplesheet_bclconvert.csv -7 $p7_barcode_file -5 $p5_barcode_file --p5_rcmp $p5_revcmp
+
   bcl-convert \
     --bcl-input-directory $illumina_run \
     --output-directory fastqs_bclconvert \
