@@ -186,7 +186,8 @@ Input (front-end) samplesheet format:
           The sentinel samples are identified by an 's' the barnyard samples
           are identified by a 'b', and the keyhole experiment is identified by
           'k'. The samples with capitalized letters are used in the dashboard
-          sentinel, barnyard, and keyhole reports. Cells may be empty. 
+          sentinel, barnyard, and keyhole reports. A column cell may have
+          up to one flag character. Cells may be empty.
   o  rt_file:
        o  paths to custom rt barcode file. The path is not checked for
           validity. Empty cells denote use of the default barcode file.
