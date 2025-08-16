@@ -72,14 +72,13 @@ pub mod barcode_utils {
 
   pub fn read_barcode_file(file_path: &str) -> Result<HashMap<String, String>, Box<dyn Error>> {
     println!("read barcode file: {}", file_path);
-    let fp = std::fs::File::open(file_path)?;
-    let buf_reader = io::BufReader::new(fp);
+    let reader = std::fs::File::open(file_path)?;
     let mut tsv_reader = ReaderBuilder::new()
                            .has_headers(false)
                            .trim(Trim::Fields)
                            .delimiter(b'\t')
                            .comment(Some(b'#'))
-                           .from_reader(buf_reader);
+                           .from_reader(reader);
 
     let mut hash_map: HashMap<String, String> = HashMap::new();
 
