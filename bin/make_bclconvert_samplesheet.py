@@ -76,7 +76,7 @@ program_version = '0.2.0'
 #
 # ** Maximum number of microtiter plates.
 #
-MAX_NUM_PLATES = 8
+MAX_NUM_PLATES = 16
 
 
 #

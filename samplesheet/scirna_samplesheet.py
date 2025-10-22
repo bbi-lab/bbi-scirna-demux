@@ -15,11 +15,16 @@
 #           type-specific processing.
 #        o  the sample
 #   o  explain how values are used in the pipelines
+#
 
 
 #
 # Notes:
 #   o  the master file is bbi-scirna-demux/samplesheet/scirna_samplesheet.py
+#   o  use these bbi-scirna-* pipelines with caution. They have not been tested
+#      thoroughly. For example, in cases where different lanes use different
+#      rt, lig, p7, and/or p5 barcode files.
+#
 
 """
 Program: scirna_samplesheet.py
@@ -63,7 +68,8 @@ Input (front-end) samplesheet format:
        o  library: an arbitrary string, which can label the library or run.
           The intention is to store the string in the CDS.
        o  process_group: an integer that distinguishes sets of samples that
-          are to be processed separately by these pipelines. For example,
+          are to be processed separately, in the sense that they result in
+          different expression matrices, cdses, etc. For example,
           different libraries that are run in different Novaseq X lanes or
           have different sets of PCR primer pairs. Each sample in a process
           group is given the same process_group integer value. The samples in
@@ -71,7 +77,9 @@ Input (front-end) samplesheet format:
           groups are given successive integer values. It is important to set
           the process_group values correctly when a run has more than one
           library where different libraries may have samples with the same
-          names.
+          names. It is critical to use distinct process_group values when
+          the libraries in different lanes use different barcode sets; that
+          is, different barcode files.
   o  sample names:
        o  begin with an alphanumeric character: a-z, A-Z, and 0-9
        o  allowed characters are alphabetic (a-z and A-Z), numeric (0-9), and
@@ -234,6 +242,11 @@ Input (front-end) samplesheet format:
             barcode sequence indices, as well as the lane number, in them).
             These fastq files are used internally only, and are not returned
             to the user, i.e., 'published' by the Nextflow pipeline.
+         o  bcl-convert samplesheet file identifies samples by lane, p7, and
+            p5 sequences. It has no knowledge of process groups, rt barcodes,
+            and ligation barcodes. Libraries that use different PCR oligo
+            primer sets (or primer oligos in different wells), must be
+            sequenced in different lanes.
          o  the reads in these fastq files are demultiplexed by RT and ligation
             barcodes. The RT barcodes identify reads by sample. The resulting
             reads are written to unaligned BAM files where all reads in a BAM

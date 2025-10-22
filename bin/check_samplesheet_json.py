@@ -12,7 +12,7 @@ program_version = '0.1.0'
 # Check JSON samplesheet file.
 #   o  check for duplicate combinations of process_group, lanes, rt indices, p7 indices, and p5 indices (done)
 #   o  check for duplicate sample names in each process group (I don't see how to do this.)
-#   o  check for different hash files in a process group
+#   o  check for different hash files in a process group (too stringent, I think. Different samples in the process group may have different hash files.)
 #   o  check for different rt files in a process group
 #   o  check for different ligation files in a process group
 #   o  check for different p7 files in a process group
@@ -354,9 +354,9 @@ if __name__ == '__main__':
   if(error_flag):
     exit_flag = 1
 
-  error_flag = check_file_process_group(sample_index_list, 'hash_file')
-  if(error_flag):
-    exit_flag = 1
+#  error_flag = check_file_process_group(sample_index_list, 'hash_file')
+#  if(error_flag):
+#    exit_flag = 1
 
   error_flag = check_file_process_group(sample_index_list, 'rt_file')
   if(error_flag):
