@@ -224,7 +224,7 @@ fn make_index_encoder(max_index: u64) -> Result<Vec<String>, Box<dyn Error>> {
 ** Read the samplesheet json file.
 */
 fn get_samplesheet_json(filename: String) -> Result<serde_json::Value, Box<dyn Error>>  {
-  let reader = std::fs::File::open(filename).unwrap();
+  let reader = std::fs::File::open(filename.clone()).expect(&format!("Error: unable to open file {}", filename.clone()));
   let v: serde_json::Value = serde_json::from_reader(reader).unwrap();
   Ok(v)
 }
@@ -493,13 +493,13 @@ fn make_barcode_id_map(sample_map_vec: &Vec<SampleMap>, barcode_type: &str, defa
   */
   let barcode_whitelist = rna_rtlig_demux::barcode_utils::read_barcode_file(&file_name).unwrap();
   let num_barcode: usize = barcode_whitelist.keys().len();
-  if(num_barcode > MAX_NUM_PLATES * 96) {
+  if(num_barcode > MAX_NUM_PLATES * 96 + 1) {
     eprintln!("The number of {} barcodes, {}, exceeds the current available storage", barcode_type, num_barcode);
     eprintln!("space. Increase the storage space by increasing the value of MAX_NUM_PLATES");
     eprintln!("in the rna_rtlig_demux source file main.rs.");
     std::process::exit(-1);
   }
-  let plate_well_index_map_by_row = make_well_index_map(MAX_NUM_PLATES*96, true, true).unwrap();
+  let plate_well_index_map_by_row = make_well_index_map(MAX_NUM_PLATES * 96 + 1, true, true).unwrap();
 
   let max_num_mismatch: usize = 1_usize;
   let barcode_correct = barcode_utils::construct_mismatch_to_whitelist_map(barcode_whitelist.keys().map(|s| s.to_string()).collect(), max_num_mismatch, true).unwrap();
@@ -683,7 +683,7 @@ fn open_writer_file(filename: &str) -> Result<Box<dyn std::io::Write>, Box<dyn E
   let file_extension = std::path::Path::new(filename)
                                 .extension()
                                 .and_then(std::ffi::OsStr::to_str).unwrap();
-  let writer = std::fs::File::create(filename).unwrap();
+  let writer = std::fs::File::create(filename).expect(&format!("Error: unable to open file {}", filename));
   if(file_extension == "gz") {
      let writer_gzencoder = GzEncoder::new(writer, flate2::Compression::new(6));
      Ok(Box::new(writer_gzencoder))
@@ -780,7 +780,7 @@ fn open_bam_writers(sample_index_to_name_map: &Vec<String>,
       let mut header = rust_htslib::bam::Header::new();
       header.push_comment(b"Made by rt_lig_demux");
       header.push_comment(format!("rt_lig_demux run date: {}", date.to_string()).as_bytes());
-      bam_out_vec.push(Box::new(rust_htslib::bam::Writer::from_path(filename, &header, rust_htslib::bam::Format::Bam).unwrap()));
+      bam_out_vec.push(Box::new(rust_htslib::bam::Writer::from_path(filename.clone(), &header, rust_htslib::bam::Format::Bam).expect(&format!("Error: unable to open file {}", filename.clone()))));
   }
 
   if(num_threads > 1) {
@@ -831,10 +831,25 @@ fn process_reads(fastq1_file: &str,
 
   let log = String::new();
 
-  let (ipl, p7_well) = barcode_utils::index_to_well(file_indices["p7"], true).unwrap();
-  let p7_well_name: String = format!("P{:02}-{}", ipl, p7_well);
-  let (ipl, p5_well) = barcode_utils::index_to_well(file_indices["p5"], false).unwrap();
-  let p5_well_name: String = format!("P{:02}-{}", ipl, p5_well);
+  #[allow(unused_assignments)]
+  let mut p7_well_name: String = String::new();
+  if(file_indices["p7"] > 0) {
+    let (ipl, p7_well) = barcode_utils::index_to_well(file_indices["p7"], true).unwrap();
+    let p7_well_name: String = format!("P{:02}-{}", ipl, p7_well);
+  }
+  else {
+    p7_well_name = "none".to_string();
+  }
+
+  #[allow(unused_assignments)]
+  let mut p5_well_name: String = String::new();
+  if(file_indices["p5"] > 0) {
+    let (ipl, p5_well) = barcode_utils::index_to_well(file_indices["p5"], false).unwrap();
+    let p5_well_name: String = format!("P{:02}-{}", ipl, p5_well);
+  }
+  else {
+    p5_well_name = "none".to_string();
+  }
 
   let p7_index_encoded = index_encoder[file_indices["p7"]].clone();
   let p5_index_encoded = index_encoder[file_indices["p5"]].clone();
@@ -850,8 +865,8 @@ fn process_reads(fastq1_file: &str,
   let mut fastq_record1 = Record::new();
   let mut fastq_record2 = Record::new();
 
-  let mut reader1 = bio::io::fastq::Reader::new(BufReader::new(open_reader_file(fastq1_file).unwrap()));
-  let mut reader2 = bio::io::fastq::Reader::new(BufReader::new(open_reader_file(fastq2_file).unwrap()));
+  let mut reader1 = bio::io::fastq::Reader::new(BufReader::new(open_reader_file(fastq1_file).expect(&format!("Error: unable to open file {}", fastq1_file))));
+  let mut reader2 = bio::io::fastq::Reader::new(BufReader::new(open_reader_file(fastq2_file).expect(&format!("Error: unable to open file {}", fastq2_file))));
 
   /*
   ** Get output file writers.
@@ -1450,13 +1465,13 @@ fn main() {
   **  the rt, ligation, p7, p5 indices. This is necessary to get
   **  around STARsolo's 31 barcode sequence limit.
   */
-  if(MAX_NUM_PLATES * 96 >= 4_usize.pow(7)) {
+  if(MAX_NUM_PLATES * 96 + 1 >= 4_usize.pow(7)) {
     eprintln!("Error: the maximum number of wells exceeds the largest well");
     eprintln!("       index encodable as a string of bases. You must");
     eprintln!("       decrease the value of MAX_NUM_PLATES in the");
     eprintln!("       rna_rtlig_demux program source file main.rs." );
   }
-  let index_encoder = make_index_encoder((MAX_NUM_PLATES*96) as u64).unwrap();
+  let index_encoder = make_index_encoder((MAX_NUM_PLATES * 96 + 1) as u64).unwrap();
 /*
   for (ii, idx) in index_encoder.into_iter().enumerate() {
     println!("{}  {:A>7}", ii, idx);

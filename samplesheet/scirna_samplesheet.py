@@ -174,7 +174,8 @@ Input (front-end) samplesheet format:
   o  p7 wells and p5 wells
        o  this program converts wells to indices and passes the indices to the
           pipeline. The pipeline uses combinations of all p7 and p5 wells. The
-          order of the wells is unimportant.
+          order of the wells is unimportant. Use the string '0' to ignore the
+          PCR index.
   o  lanes:
        o  given as one or more lanes or ranges of lanes using a colon, ':',
           to specify lane ranges, and commas, ',', to separate lanes or lane
