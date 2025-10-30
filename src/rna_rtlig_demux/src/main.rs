@@ -835,7 +835,7 @@ fn process_reads(fastq1_file: &str,
   let mut p7_well_name: String = String::new();
   if(file_indices["p7"] > 0) {
     let (ipl, p7_well) = barcode_utils::index_to_well(file_indices["p7"], true).unwrap();
-    let p7_well_name: String = format!("P{:02}-{}", ipl, p7_well);
+    p7_well_name = format!("P{:02}-{}", ipl, p7_well);
   }
   else {
     p7_well_name = "none".to_string();
@@ -845,7 +845,7 @@ fn process_reads(fastq1_file: &str,
   let mut p5_well_name: String = String::new();
   if(file_indices["p5"] > 0) {
     let (ipl, p5_well) = barcode_utils::index_to_well(file_indices["p5"], false).unwrap();
-    let p5_well_name: String = format!("P{:02}-{}", ipl, p5_well);
+    p5_well_name = format!("P{:02}-{}", ipl, p5_well);
   }
   else {
     p5_well_name = "none".to_string();

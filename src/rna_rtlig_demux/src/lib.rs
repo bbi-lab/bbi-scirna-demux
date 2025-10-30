@@ -7,7 +7,6 @@
 //! Reproduce Andrew Hill's barcode_utils.py in Rust, a bit at a time.
 pub mod barcode_utils {
 
-  use std::io;
   use std::error::Error;
   use std::collections::HashMap;
   use itertools::Itertools;
