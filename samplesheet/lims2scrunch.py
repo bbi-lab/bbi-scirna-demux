@@ -8,24 +8,6 @@
 # This a minimal script at this time.
 #
 
-#
-# Template parameter file:
-#
-# Notes:
-#   Uncommented line and add value.
-#   Leading a trailing spaces are dropped.
-#   Character escaping is unsupported.
-#
-# rt_file: ""
-# ligation_file: ""
-# p7_file: ""
-# p5_file: ""
-# hash_file: ""
-# lanes: ""
-# p7_wells: ""
-# p5_wells: ""
-# lanes: ""
-#
 
 import sys
 import argparse
@@ -34,6 +16,35 @@ import json
 import re
 import operator
 import shlex
+
+
+description_string = '''Convert a BBI LIMS manifest to a sample-oriented CSV samplesheet file.
+
+Add columns to the output file using a parameters input file, which has values common to all rows. The template for the parameters file is
+
+# rt_file: ""
+# ligation_file: ""
+# p7_file: ""
+# p5_file: ""
+# hash_file: ""
+# lanes: ""
+# p7_wells: ""
+# p5_wells: ""
+
+To set a parameter, remove the '#' and add the value between the pair of double quotes. This script uses the shlex python package to interpret the parameter file contents.
+
+You will almost certainly need to edit the resulting CSV file using a spreadsheet program before running the scirna_samplesheet.py script on it in order to make the samplesheet JSON file required by the bbi-scirna-demux and bbi-scirna-analyze pipelines.
+
+Specify lanes individually, separated by commas, or as ranges, using a colon between the first and last lanes in the range. As examples, "1,3,6" or "1:8" or "2:4,6:8".
+
+Specify p7_wells and p5_wells individually, separated by commas, or as ranges, using a colon between the first and last wells.
+
+Note that the p7 well ranges increase along rows so "P01-A01:P01-A12" is the first p7 row, and the p5 well ranges increase along columns so "P01-A01:P01-H01" is the first p5 column. An entire plate is "P01-A01:P01-H12".
+
+These pipelines require that the p7 and p5 well names include the plate number.
+'''
+
+
 
 # "name","experiment","assay","plate","coordinates","RT_block","BBI_ID","investigatorSpecimenId","investigator","organism","tissue","genome"
 # "RNA3-074-P01-A1-24.0262","RNA3-074","sci-RNA-seq","P01","A1","RNA3-074_24.0262","24.0262","RA-gastruloid-2day","Hamazaki","Human","Gastruloid","Human"
@@ -196,7 +207,7 @@ def read_parameter_file(filename):
 
 if __name__ == '__main__':
 
-  parser = argparse.ArgumentParser(description='A program to make a samplesheet CSV file for the bbi-dmux pipeline from a LIMS CSV experiment manifest file.')
+  parser = argparse.ArgumentParser(description=description_string, formatter_class=argparse.RawDescriptionHelpFormatter)
   parser.add_argument('-i', '--in_file', required=True, help='Input LIMS manifest CSV filename.')
   parser.add_argument('-o', '--out_file', required=True, help='Output CSV filename.')
   parser.add_argument('-p', '--parameter_file', required='False', default=None, help='Output CSV filename (default is SampleSheet.csv).')
