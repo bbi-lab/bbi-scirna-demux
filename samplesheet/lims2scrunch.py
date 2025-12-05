@@ -18,6 +18,9 @@ import operator
 import shlex
 
 
+#
+# This is a multi-line description string for argparse help.
+#
 description_string = '''Convert a BBI LIMS manifest to a sample-oriented CSV samplesheet file.
 
 Add columns to the output file using a parameters input file, which has values common to all rows. The template for the parameters file is
@@ -104,31 +107,31 @@ def store_row_values_dicts(header_row, inrows):
 def gather_sample_rows(inrows_dicts):
   sample_dicts = dict()
   for row_dict in inrows_dicts:
-    bbi_id = row_dict['BBI_ID']
-    if(sample_dicts.get(bbi_id) != None):
-      if(row_dict['investigatorSpecimenId'] != sample_dicts[bbi_id]['investigatorSpecimenId']):
-        print('Error: inconsistent investigatorSpecimenId for sample %s' % (bbi_id), file=sys.stderr)
-      if(row_dict['investigator'] != sample_dicts[bbi_id]['investigator']):
-        print('Error: inconsistent investigatorSpecimenId for sample %s' % (bbi_id), file=sys.stderr)
-      if(row_dict['organism'] != sample_dicts[bbi_id]['organism']):
-        print('Error: inconsistent investigatorSpecimenId for sample %s' % (bbi_id), file=sys.stderr)
-      if(row_dict['tissue'] != sample_dicts[bbi_id]['tissue']):
-        print('Error: inconsistent investigatorSpecimenId for sample %s' % (bbi_id), file=sys.stderr)
-      if(row_dict['genome'] != sample_dicts[bbi_id]['genome']):
-        print('Error: inconsistent investigatorSpecimenId for sample %s' % (bbi_id), file=sys.stderr)
+    RT_block = row_dict['RT_block']
+    if(sample_dicts.get(RT_block) != None):
+      if(row_dict['investigatorSpecimenId'] != sample_dicts[RT_block]['investigatorSpecimenId']):
+        print('Error: inconsistent investigatorSpecimenId for sample %s' % (RT_block), file=sys.stderr)
+      if(row_dict['investigator'] != sample_dicts[RT_block]['investigator']):
+        print('Error: inconsistent investigatorSpecimenId for sample %s' % (RT_block), file=sys.stderr)
+      if(row_dict['organism'] != sample_dicts[RT_block]['organism']):
+        print('Error: inconsistent investigatorSpecimenId for sample %s' % (RT_block), file=sys.stderr)
+      if(row_dict['tissue'] != sample_dicts[RT_block]['tissue']):
+        print('Error: inconsistent investigatorSpecimenId for sample %s' % (RT_block), file=sys.stderr)
+      if(row_dict['genome'] != sample_dicts[RT_block]['genome']):
+        print('Error: inconsistent investigatorSpecimenId for sample %s' % (RT_block), file=sys.stderr)
       #
       # Append well.
       #
-      sample_dicts[bbi_id]['rt_wells'].append(row_dict['rt_well'])
+      sample_dicts[RT_block]['rt_wells'].append(row_dict['rt_well'])
     else:
-      sample_dicts[bbi_id] = dict()
-      sample_dicts[bbi_id]['investigatorSpecimenId'] = row_dict['investigatorSpecimenId']
-      sample_dicts[bbi_id]['investigator'] = row_dict['investigator']
-      sample_dicts[bbi_id]['organism'] = row_dict['organism']
-      sample_dicts[bbi_id]['tissue'] = row_dict['tissue']
-      sample_dicts[bbi_id]['genome'] = row_dict['genome']
-      sample_dicts[bbi_id]['rt_wells'] = list()
-      sample_dicts[bbi_id]['rt_wells'].append(row_dict['rt_well'])
+      sample_dicts[RT_block] = dict()
+      sample_dicts[RT_block]['investigatorSpecimenId'] = row_dict['investigatorSpecimenId']
+      sample_dicts[RT_block]['investigator'] = row_dict['investigator']
+      sample_dicts[RT_block]['organism'] = row_dict['organism']
+      sample_dicts[RT_block]['tissue'] = row_dict['tissue']
+      sample_dicts[RT_block]['genome'] = row_dict['genome']
+      sample_dicts[RT_block]['rt_wells'] = list()
+      sample_dicts[RT_block]['rt_wells'].append(row_dict['rt_well'])
   return(sample_dicts)
         
 
@@ -152,10 +155,10 @@ def write_sample_sheet(sample_dicts, parameter_dict, outfile):
                      'tissue',
                      'external_sample_name',
                      'wrap_group'])
-    for bbi_id in sample_dicts.keys():
-      rt_wells_string = ','.join(sample_dicts[bbi_id]['rt_wells'])
-      writer.writerow([bbi_id,
-                      sample_dicts[bbi_id]['genome'],
+    for RT_block in sample_dicts.keys():
+      rt_wells_string = ','.join(sample_dicts[RT_block]['rt_wells'])
+      writer.writerow([RT_block,
+                      sample_dicts[RT_block]['genome'],
                       '1',
                       parameter_dict['lanes'],
                       rt_wells_string,
@@ -166,9 +169,9 @@ def write_sample_sheet(sample_dicts, parameter_dict, outfile):
                       parameter_dict['p7_file'],
                       parameter_dict['p5_file'],
                       parameter_dict['hash_file'],
-                      sample_dicts[bbi_id]['tissue'],
-                      sample_dicts[bbi_id]['investigatorSpecimenId'],
-                      sample_dicts[bbi_id]['investigator']])
+                      sample_dicts[RT_block]['tissue'],
+                      sample_dicts[RT_block]['investigatorSpecimenId'],
+                      sample_dicts[RT_block]['investigator']])
   return(0)
 
 
@@ -210,7 +213,7 @@ if __name__ == '__main__':
   parser = argparse.ArgumentParser(description=description_string, formatter_class=argparse.RawDescriptionHelpFormatter)
   parser.add_argument('-i', '--in_file', required=True, help='Input LIMS manifest CSV filename.')
   parser.add_argument('-o', '--out_file', required=True, help='Output CSV filename.')
-  parser.add_argument('-p', '--parameter_file', required='False', default=None, help='Output CSV filename (default is SampleSheet.csv).')
+  parser.add_argument('-p', '--parameter_file', required=True, help='Input parameters filename.')
 
   args = parser.parse_args()
 
