@@ -266,7 +266,7 @@ Input (front-end) samplesheet format:
             you need the pipeline to process separately the reads from each
             library, assign a distinct process_group value to the sample
             rows for each library.
-         o  the unaligned BAM files are processed by cutadapt to trim off
+         o  the unaligned BAM files are processed by trimgalore to trim off
             adapter sequence. The resulting BAM file names have the form
               <sample_name>-<process_group>_<p7_index>_<p5_index>.trimmed.bam
             These BAM files are not published. 
