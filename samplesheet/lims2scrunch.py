@@ -107,31 +107,31 @@ def store_row_values_dicts(header_row, inrows):
 def gather_sample_rows(inrows_dicts):
   sample_dicts = dict()
   for row_dict in inrows_dicts:
-    RT_block = row_dict['RT_block']
-    if(sample_dicts.get(RT_block) != None):
-      if(row_dict['investigatorSpecimenId'] != sample_dicts[RT_block]['investigatorSpecimenId']):
-        print('Error: inconsistent investigatorSpecimenId for sample %s' % (RT_block), file=sys.stderr)
-      if(row_dict['investigator'] != sample_dicts[RT_block]['investigator']):
-        print('Error: inconsistent investigatorSpecimenId for sample %s' % (RT_block), file=sys.stderr)
-      if(row_dict['organism'] != sample_dicts[RT_block]['organism']):
-        print('Error: inconsistent investigatorSpecimenId for sample %s' % (RT_block), file=sys.stderr)
-      if(row_dict['tissue'] != sample_dicts[RT_block]['tissue']):
-        print('Error: inconsistent investigatorSpecimenId for sample %s' % (RT_block), file=sys.stderr)
-      if(row_dict['genome'] != sample_dicts[RT_block]['genome']):
-        print('Error: inconsistent investigatorSpecimenId for sample %s' % (RT_block), file=sys.stderr)
+    rt_block = row_dict['RT_block']
+    if(sample_dicts.get(rt_block) != None):
+      if(row_dict['investigatorSpecimenId'] != sample_dicts[rt_block]['investigatorSpecimenId']):
+        print('Error: inconsistent investigatorSpecimenId for sample %s' % (rt_block), file=sys.stderr)
+      if(row_dict['investigator'] != sample_dicts[rt_block]['investigator']):
+        print('Error: inconsistent investigatorSpecimenId for sample %s' % (rt_block), file=sys.stderr)
+      if(row_dict['organism'] != sample_dicts[rt_block]['organism']):
+        print('Error: inconsistent investigatorSpecimenId for sample %s' % (rt_block), file=sys.stderr)
+      if(row_dict['tissue'] != sample_dicts[rt_block]['tissue']):
+        print('Error: inconsistent investigatorSpecimenId for sample %s' % (rt_block), file=sys.stderr)
+      if(row_dict['genome'] != sample_dicts[rt_block]['genome']):
+        print('Error: inconsistent investigatorSpecimenId for sample %s' % (rt_block), file=sys.stderr)
       #
       # Append well.
       #
-      sample_dicts[RT_block]['rt_wells'].append(row_dict['rt_well'])
+      sample_dicts[rt_block]['rt_wells'].append(row_dict['rt_well'])
     else:
-      sample_dicts[RT_block] = dict()
-      sample_dicts[RT_block]['investigatorSpecimenId'] = row_dict['investigatorSpecimenId']
-      sample_dicts[RT_block]['investigator'] = row_dict['investigator']
-      sample_dicts[RT_block]['organism'] = row_dict['organism']
-      sample_dicts[RT_block]['tissue'] = row_dict['tissue']
-      sample_dicts[RT_block]['genome'] = row_dict['genome']
-      sample_dicts[RT_block]['rt_wells'] = list()
-      sample_dicts[RT_block]['rt_wells'].append(row_dict['rt_well'])
+      sample_dicts[rt_block] = dict()
+      sample_dicts[rt_block]['investigatorSpecimenId'] = row_dict['investigatorSpecimenId']
+      sample_dicts[rt_block]['investigator'] = row_dict['investigator']
+      sample_dicts[rt_block]['organism'] = row_dict['organism']
+      sample_dicts[rt_block]['tissue'] = row_dict['tissue']
+      sample_dicts[rt_block]['genome'] = row_dict['genome']
+      sample_dicts[rt_block]['rt_wells'] = list()
+      sample_dicts[rt_block]['rt_wells'].append(row_dict['rt_well'])
   return(sample_dicts)
         
 
@@ -155,10 +155,10 @@ def write_sample_sheet(sample_dicts, parameter_dict, outfile):
                      'tissue',
                      'external_sample_name',
                      'wrap_group'])
-    for RT_block in sample_dicts.keys():
-      rt_wells_string = ','.join(sample_dicts[RT_block]['rt_wells'])
-      writer.writerow([RT_block,
-                      sample_dicts[RT_block]['genome'],
+    for rt_block in sample_dicts.keys():
+      rt_wells_string = ','.join(sample_dicts[rt_block]['rt_wells'])
+      writer.writerow([rt_block,
+                      sample_dicts[rt_block]['genome'],
                       '1',
                       parameter_dict['lanes'],
                       rt_wells_string,
@@ -169,9 +169,9 @@ def write_sample_sheet(sample_dicts, parameter_dict, outfile):
                       parameter_dict['p7_file'],
                       parameter_dict['p5_file'],
                       parameter_dict['hash_file'],
-                      sample_dicts[RT_block]['tissue'],
-                      sample_dicts[RT_block]['investigatorSpecimenId'],
-                      sample_dicts[RT_block]['investigator']])
+                      sample_dicts[rt_block]['tissue'],
+                      sample_dicts[rt_block]['investigatorSpecimenId'],
+                      sample_dicts[rt_block]['investigator']])
   return(0)
 
 
