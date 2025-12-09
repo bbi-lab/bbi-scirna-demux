@@ -403,33 +403,39 @@ default_p5_file = ''
 # This program issues a warning if a samplesheet genome is
 # not in this list.
 #
+#   'arabidopsis',
+#   'barnyard',
+#   'bat',
+#   'cat',
+#   'chicken',
+#   'corn',
+#   'cow',
+#   'cynomolgus',
+#   'dog',
+#   'drosophila',
+#   'duck',
+#   'elephant',
+#   'horse',
+#   'human',
+#   'macaque',
+#   'mouse',
+#   'opossum',
+#   'pig',
+#   'rabbit',
+#   'rat',
+#   'snake',
+#   'worm',
+#   'zebrafish',
+#   'hg19',
+#   'mm19',
+#   'hg19_mm9',
 genome_name_list = [
-  'arabidopsis',
-  'barnyard',
-  'bat',
-  'cat',
-  'chicken',
-  'corn',
-  'cow',
-  'cynomolgus',
-  'dog',
-  'drosophila',
-  'duck',
-  'elephant',
-  'horse',
-  'human',
-  'macaque',
-  'mouse',
-  'opossum',
-  'pig',
-  'rabbit',
-  'rat',
-  'snake',
-  'worm',
-  'zebrafish',
-  'hg19',
-  'mm19',
-  'hg19_mm9'
+  'Human',
+  'Mouse',
+  'Barnyard',
+  'Human_10x',
+  'Zebrafish',
+  'Fishbowl_seahub'
 ]
 
 
@@ -528,6 +534,9 @@ def test_string(string, test):
   elif( int( test ) == 2 ):
     if( not re.search( r'[^a-zA-Z0-9._-]', string ) ):
       return(True)
+  if( int( test ) == 3 ):
+    if( not re.search( r'[\b\f\n\r\\\"]', string ) ):
+      return( True )
   else:
     print( 'Error: test_string: unknown test value: %d' % ( int( test ) ) )
     return( False )
@@ -1205,7 +1214,7 @@ def check_external_sample_name( column_name_list, samplesheet_row_list ):
         continue
       sample_name_in_dict.setdefault( element_string, 0 )
       sample_name_in_dict[element_string] += 1
-      if(not test_string( element_string, 1 ) ):
+      if(not test_string( element_string, 3 ) ):
         print( 'Error: bad external sample name in row %d' % ( irow + 2 ), file=sys.stderr )
         errorFlag = True
       sample_name_out_dict.setdefault( element_string, True )
