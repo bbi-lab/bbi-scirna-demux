@@ -6,4 +6,3 @@
 # lanes: ""
 # p7_wells: ""
 # p5_wells: ""
-# lanes: ""
