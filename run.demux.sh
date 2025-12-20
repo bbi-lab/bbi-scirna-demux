@@ -3,7 +3,7 @@
 #
 # Edit the NEXTFLOW path to your Nextflow installation.
 #
-NEXTFLOW="/net/gs/vol1/home/bge/src/nextflow/nextflow.25.04.2.5947"
+NEXTFLOW="/net/gs/vol1/home/bge/src/nextflow/nextflow.25.10.2.10555"
 
 #
 # Edit the MAIN_NF path to the main.nf file in your
