@@ -24,6 +24,8 @@
 #   o  use these bbi-scirna-* pipelines with caution. They have not been tested
 #      thoroughly. For example, in cases where different lanes use different
 #      rt, lig, p7, and/or p5 barcode files.
+#   o  ensure that the ligation file is correct. The ligation files for the
+#      standard and jumbo (mega) sci differ.
 #
 
 """
