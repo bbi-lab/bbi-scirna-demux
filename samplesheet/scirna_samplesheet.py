@@ -7,9 +7,6 @@
 #   o  column_header_name_list = [ 'rt_wells', 'sample_name', 'genome', 'sample_flags', 'external_sample_name', 'tissue', 'wrap_group', 'lanes', 'hash_file', 'rt_file', 'ligation_file', 'p7_file', 'p5_file', 'library', 'process_group' ]
 #   o  columns_required_list = [ 'rt', 'p5', 'p7', 'sample_name', 'genome' ]
 #   o  check --lanes as optional parameter (uses -n <n> to define default)   (no)
-#   o  point out that different samples may have different rt_file,
-#      ligation_file, p7_file, p5_file, and hash_file values in case of
-#      different libraries
 #   o  check sample_flags description for completeness
 #        o  the flags are used to identify certain sample types, which receive
 #           type-specific processing.
