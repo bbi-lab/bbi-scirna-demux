@@ -481,7 +481,7 @@ fn make_barcode_id_map(sample_map_vec: &Vec<SampleMap>, barcode_type: &str, defa
   if(file_name.len() == 0) {
     file_name = default_file.to_string();
   }
-  println!("file_name: {}", file_name);
+  println!("read {} barcode file: {}", barcode_type, file_name);
 
 
   /*
@@ -557,7 +557,12 @@ fn make_barcode_id_map(sample_map_vec: &Vec<SampleMap>, barcode_type: &str, defa
 
   /*
   for key in barcode_id_map.keys() {
-    println!("barcode id map key: {:#?}  val: {:#?}", key, barcode_id_map[key].well_name);
+//    println!("barcode id map key: {:#?}  val: {:#?}", key, barcode_id_map[key].well_name);
+    println!("barcode id map key: {:#?}  corrected_flag: {:#?}  well_name: {:#?}  well_index: {:#?}",
+             std::str::from_utf8(&key).unwrap(),
+             barcode_id_map[key].corrected_flag,
+             barcode_id_map[key].well_name,
+             barcode_id_map[key].well_index);
   }
   */
 
@@ -1473,10 +1478,11 @@ fn main() {
   }
   let index_encoder = make_index_encoder((MAX_NUM_PLATES * 96 + 1) as u64).unwrap();
 /*
-  for (ii, idx) in index_encoder.into_iter().enumerate() {
-    println!("{}  {:A>7}", ii, idx);
+  for (ii, idx) in index_encoder.clone().into_iter().enumerate() {
+    println!("index encoder: {}  {:A>7}", ii, idx);
   }
 */
+
   // Read samplesheet JSON file.
   let samplesheet_json: serde_json::Value = get_samplesheet_json(samplesheet_file).unwrap();
 

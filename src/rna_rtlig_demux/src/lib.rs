@@ -70,7 +70,7 @@ pub mod barcode_utils {
   }
 
   pub fn read_barcode_file(file_path: &str) -> Result<HashMap<String, String>, Box<dyn Error>> {
-    println!("read barcode file: {}", file_path);
+    // println!("read barcode file: {}", file_path);
     let reader = std::fs::File::open(file_path).expect(&format!("Error: unable to open file {}", file_path));
     let mut tsv_reader = ReaderBuilder::new()
                            .has_headers(false)
