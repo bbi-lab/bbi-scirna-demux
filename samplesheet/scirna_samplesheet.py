@@ -384,8 +384,8 @@ import copy
 #
 # Samplesheet JSON file version.
 #
-program_version = '0.1.8'
-json_file_version = '1.0.0'
+program_version = '0.2.0'
+json_file_version = '2.0.0'
 
 
 #
@@ -2082,14 +2082,22 @@ def write_samplesheet_json_format( file, column_name_list, samplesheet_row_list,
                   'sequencer_run_directory' : sequencer_run_directory,
                   'level' : level,
                   'number_lanes' : number_lanes,
-                  'input_samplesheet_column_names' : input_column_name_list,
-                  'input_samplesheet_rows' : input_samplesheet_rows,
-                  'p5_col_list' : p5_col_list,
-                  'p7_row_list' : p7_row_list,
-                  'p5_well_list' : p5_well_list,
-                  'p7_well_list' : p7_well_list,
                   'sample_index_list' : sample_index_list
                 }
+
+#   sample_data = { 'json_file_version' : json_file_version,
+#                   'sequencer_class' : sequencer_class,
+#                   'sequencer_run_directory' : sequencer_run_directory,
+#                   'level' : level,
+#                   'number_lanes' : number_lanes,
+#                   'input_samplesheet_column_names' : input_column_name_list,
+#                   'input_samplesheet_rows' : input_samplesheet_rows,
+#                   'p5_col_list' : p5_col_list,
+#                   'p7_row_list' : p7_row_list,
+#                   'p5_well_list' : p5_well_list,
+#                   'p7_well_list' : p7_well_list,
+#                   'sample_index_list' : sample_index_list
+#                 }
 
   file.write(json.dumps(sample_data, indent=4))
 
