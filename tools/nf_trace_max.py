@@ -56,13 +56,13 @@ for i in range(4):
   new_list = [None, None]
   pobj_list_2.append(new_list)
 pobj_list_2[0][0] = 1.0
-pobj_list_2[0][1] = re.compile(r'([0-9.]+) B')
+pobj_list_2[0][1] = re.compile(r'([0-9.]+) B$')
 pobj_list_2[1][0] = 1000.0
-pobj_list_2[1][1] = re.compile(r'([0-9.]+) KB')
+pobj_list_2[1][1] = re.compile(r'([0-9.]+) KB$')
 pobj_list_2[2][0] = 1000000.0
-pobj_list_2[2][1] = re.compile(r'([0-9.]+) MB')
+pobj_list_2[2][1] = re.compile(r'([0-9.]+) MB$')
 pobj_list_2[3][0] = 1000000000.0
-pobj_list_2[3][1] = re.compile(r'([0-9.]+) GB')
+pobj_list_2[3][1] = re.compile(r'([0-9.]+) GB$')
 
 def get_mem_peak(string):
   mem_use = 0.0
@@ -82,7 +82,7 @@ with open(filename, 'r', newline='') as ifh:
   for row in csv_reader:
     # Process name.
     process_name = row[3].split()[0]
-    if(process_dict.get('process_name') == None):
+    if(process_dict.get(process_name) == None):
       new_dict = dict()
       process_dict[process_name] = new_dict
     # Get maximum run duration
@@ -103,8 +103,6 @@ with open(filename, 'r', newline='') as ifh:
     rss_mem_peak = get_mem_peak(row[10])
     if(rss_mem_peak > process_dict[process_name]['rss_mem_peak']):
       process_dict[process_name]['rss_mem_peak'] = rss_mem_peak
-
-
 
   process_name_length_max = 0
   for process_name in process_dict.keys():
