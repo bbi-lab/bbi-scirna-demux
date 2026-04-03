@@ -33,6 +33,9 @@ Add columns to the output file using a parameters input file, which has values c
 # lanes: ""
 # p7_wells: ""
 # p5_wells: ""
+# barnyard_sample_name: ""
+# sentinel_sample_name: ""
+# keyhole_sample_name: ""
 
 To set a parameter, remove the '#' and add the value between the pair of double quotes. This script uses the shlex python package to interpret the parameter file contents.
 
@@ -49,7 +52,6 @@ These pipelines require that the p7 and p5 well names include the plate number.
 
 
 
-# "name","experiment","assay","plate","coordinates","RT_block","BBI_ID","investigatorSpecimenId","investigator","organism","tissue","genome"
 # "RNA3-074-P01-A1-24.0262","RNA3-074","sci-RNA-seq","P01","A1","RNA3-074_24.0262","24.0262","RA-gastruloid-2day","Hamazaki","Human","Gastruloid","Human"
 # "RNA3-074-P01-A10-24.0270","RNA3-074","sci-RNA-seq","P01","A10","RNA3-074_24.0270","24.0270","RA-gastruloid-36h","Hamazaki","Human","Gastruloid","Human"
 # "RNA3-074-P01-A11-24.0270","RNA3-074","sci-RNA-seq","P01","A11","RNA3-074_24.0270","24.0270","RA-gastruloid-36h","Hamazaki","Human","Gastruloid","Human"
@@ -152,11 +154,24 @@ def write_sample_sheet(sample_dicts, parameter_dict, outfile):
                      'p7_file',
                      'p5_file',
                      'hash_file',
+                     'sample_flags',
                      'tissue',
                      'external_sample_name',
                      'wrap_group'])
     for rt_block in sample_dicts.keys():
       rt_wells_string = ','.join(sample_dicts[rt_block]['rt_wells'])
+      print('sample: ', rt_block)
+      sample_flags = ''
+      if(len(parameter_dict['barnyard_sample_name']) > 0 and rt_block == parameter_dict['barnyard_sample_name']):
+        print('set barnyard flag')
+        sample_flags = sample_flags + 'B'
+      if(len(parameter_dict['sentinel_sample_name']) > 0 and rt_block == parameter_dict['sentinel_sample_name']):
+        print('set sentinel flag')
+        sample_flags = sample_flags + 'S'
+      if(len(parameter_dict['keyhole_sample_name']) > 0 and rt_block == parameter_dict['keyhole_sample_name']):
+        print('set keyhole flag')
+        sample_flags = sample_flags + 'K'
+
       writer.writerow([rt_block,
                       sample_dicts[rt_block]['genome'],
                       '1',
@@ -169,6 +184,7 @@ def write_sample_sheet(sample_dicts, parameter_dict, outfile):
                       parameter_dict['p7_file'],
                       parameter_dict['p5_file'],
                       parameter_dict['hash_file'],
+                      sample_flags,
                       sample_dicts[rt_block]['tissue'],
                       sample_dicts[rt_block]['investigatorSpecimenId'],
                       sample_dicts[rt_block]['investigator']])
@@ -185,7 +201,7 @@ def write_sample_sheet(sample_dicts, parameter_dict, outfile):
 # p5_wells: ""
 # lanes: ""
 def read_parameter_file(filename):
-  parameter_list = ['rt_file', 'ligation_file', 'p7_file', 'p5_file', 'hash_file', 'lanes', 'p7_wells', 'p5_wells']
+  parameter_list = ['rt_file', 'ligation_file', 'p7_file', 'p5_file', 'hash_file', 'lanes', 'p7_wells', 'p5_wells', 'barnyard_sample_name', 'sentinel_sample_name', 'keyhole_sample_name']
   parameter_dict = dict()
   for parameter in parameter_list:
     parameter_dict[parameter] = ''
