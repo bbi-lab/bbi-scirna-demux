@@ -52,6 +52,7 @@ These pipelines require that the p7 and p5 well names include the plate number.
 
 
 
+# "name","experiment","assay","plate","coordinates","RT_block","BBI_ID","investigatorSpecimenId","investigator","organism","tissue","genome"
 # "RNA3-074-P01-A1-24.0262","RNA3-074","sci-RNA-seq","P01","A1","RNA3-074_24.0262","24.0262","RA-gastruloid-2day","Hamazaki","Human","Gastruloid","Human"
 # "RNA3-074-P01-A10-24.0270","RNA3-074","sci-RNA-seq","P01","A10","RNA3-074_24.0270","24.0270","RA-gastruloid-36h","Hamazaki","Human","Gastruloid","Human"
 # "RNA3-074-P01-A11-24.0270","RNA3-074","sci-RNA-seq","P01","A11","RNA3-074_24.0270","24.0270","RA-gastruloid-36h","Hamazaki","Human","Gastruloid","Human"
@@ -160,16 +161,12 @@ def write_sample_sheet(sample_dicts, parameter_dict, outfile):
                      'wrap_group'])
     for rt_block in sample_dicts.keys():
       rt_wells_string = ','.join(sample_dicts[rt_block]['rt_wells'])
-      print('sample: ', rt_block)
       sample_flags = ''
       if(len(parameter_dict['barnyard_sample_name']) > 0 and rt_block == parameter_dict['barnyard_sample_name']):
-        print('set barnyard flag')
         sample_flags = sample_flags + 'B'
       if(len(parameter_dict['sentinel_sample_name']) > 0 and rt_block == parameter_dict['sentinel_sample_name']):
-        print('set sentinel flag')
         sample_flags = sample_flags + 'S'
       if(len(parameter_dict['keyhole_sample_name']) > 0 and rt_block == parameter_dict['keyhole_sample_name']):
-        print('set keyhole flag')
         sample_flags = sample_flags + 'K'
 
       writer.writerow([rt_block,
