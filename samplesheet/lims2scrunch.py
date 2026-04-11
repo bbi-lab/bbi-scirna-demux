@@ -7,6 +7,13 @@
 #
 # This a minimal script at this time.
 #
+# Notes:
+#   o  the values in the parameter.txt file are applied to all
+#      samples in the output file, except for the *_sample_name
+#      values, which are applied only to the specified samples.
+#      Consequently, you may need to edit some of the values in
+#      the output .csv file using a spreadsheet program.
+#
 
 
 import sys
