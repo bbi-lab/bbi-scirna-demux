@@ -2,7 +2,7 @@
 
 ## Intro
 
-This *bbi-scirna-demux* pipeline runs the Illumina *bcl-convert* program to make *.bam* files that are demultiplexed by PCR primer pairs, followed by the *rna_rtlig_demux* program to make sample-specific pcr primer pair *.bam* files.
+This *bbi-scirna-demux* pipeline runs the Illumina *bcl-convert* program to make *.bam* files that are demultiplexed by PCR primer pairs, followed by the *rna_rtlig_demux* program to make sample-specific pcr primer pair *.bam* files. Use the *develop* branch.
 
 ## Installation
 
@@ -59,11 +59,12 @@ params.output_dir
 
 ### Make the samplesheet JSON file.
 
-This is a bit lengthy at this time. The steps are
+The file bbi-scirna-demux/samplesheet/scirna_samplesheet.py has detailed information for making a samplesheet JSON file. The steps are
 
 - run *bbi-scirna-demux/samplesheet/lims2scrunch.py* on a LIMS CSV manifest file to make a CSV samplesheet file where each row describes a sample. Run *lims2scrunch.py --help* command for more information.
-- run *bbi-scirna-demux/samplesheet/samplesheet_scrunch.py* on a samplesheet CSV file that is suitable for the *bbi-dmux* pipeline. In the simplest case, the input file has one row per RT well and the output CSV file has one row per sample. *samplesheet_scrunch.py* also adds columns that give the PCR primer wells or columns and rows. Run *samplesheet_scrunch.py --help* command for more information.
-- run *bbi-scirna-demux/samplesheet/scirna_samplesheet.py* to convert the scrunched CSV file to a JSON file. *scirna_samplesheet.py* requires a command line parameter that gives the number of lanes used in the sequencing run. Run *scirna_samplesheet.py -d* for detailed documentation. (At this early stage of the program's life, there may be omissions and errors in the documentation.) You may need to edit the scrunched CSV file in a spreadsheet program in order to add columns described in the *scirna_samplesheet.py* documentation.
+- alternatively, run *bbi-scirna-demux/samplesheet/samplesheet_scrunch.py* on a samplesheet CSV file that is suitable for the *bbi-dmux* pipeline. In the simplest case, the input file has one row per RT well and the output CSV file has one row per sample. *samplesheet_scrunch.py* also adds columns that give the PCR primer wells or columns and rows. Run *samplesheet_scrunch.py --help* command for more information.
+- edit the scrunched *.csv* file as needed using a spreadsheet program. This is needed to add the hash barcode file paths, for example. See the scirna_samplesheet.py* program for information about the input *.csv* file format.
+- run *bbi-scirna-demux/samplesheet/scirna_samplesheet.py* to convert the scrunched, edited  CSV file to a JSON file. *scirna_samplesheet.py* requires a command line parameter that gives the number of lanes used in the sequencing run. Run *scirna_samplesheet.py -d* for detailed documentation. (At this early stage of the program's life, there may be omissions and errors in the documentation.)
 - the ligation barcode file for the standard and jumbo/mega sci experiments differ. Use the *bbi-scirna-demux/data/ligation.txt* for standard sci and *bbi-scirna-demux/data/ligation_megasci.row_sorted.tsv* for jumbo sci.
 
 ### Run *bbi-scirna-demux*
