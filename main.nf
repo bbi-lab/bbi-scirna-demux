@@ -60,15 +60,15 @@ workflow {
 */
 def make_pairwise_fastq_bclconvert(fastqs_bclconvert) {
   def fastq_pairs = []
-  for(fastq_path in fastqs_bclconvert) {
-    fastq_string = fastq_path.toString()
+  for(def fastq_path in fastqs_bclconvert) {
+    def fastq_string = fastq_path.toString()
     if(fastq_string =~ '.+_R1_[0-9]{3}.fastq.gz') {
       if(fastq_string =~ '/Undetermined_.+') {
         continue
       }
-      fastq_r1 = fastq_path
-      fastq_r2 = Paths.get(fastq_string.replaceAll("_R1_", "_R2_"))
-      tuple = new Tuple(fastq_r1, fastq_r2) 
+      def fastq_r1 = fastq_path
+      def fastq_r2 = Paths.get(fastq_string.replaceAll("_R1_", "_R2_"))
+      def tuple = new Tuple(fastq_r1, fastq_r2) 
       fastq_pairs.add(tuple)
     }
   }
