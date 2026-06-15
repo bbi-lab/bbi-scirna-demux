@@ -84,6 +84,7 @@ o samplesheet67.csv       lanes: multiple single lanes
 o samplesheet68.csv       lanes: lane range
 o samplesheet69.csv       lanes: out-of-order lanes
 o samplesheet70.csv       lanes: listed in run report? (intentionally not listed in run report)
+o samplesheet70_1.csv     lanes: double digit lane range
 
 o samplesheet71.csv       hash file: no column
 o samplesheet72.csv       hash file: empty cell

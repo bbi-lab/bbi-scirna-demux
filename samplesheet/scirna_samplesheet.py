@@ -551,7 +551,7 @@ def clean_samplesheet_data( column_name_list, samplesheet_row_list ):
   errorFlag = False
   for irow, row_elements in enumerate(samplesheet_row_list):
     for icol in range( len( row_elements ) ):
-      clean_string( row_elements[icol] )
+      row_elements[icol] = clean_string( row_elements[icol] )
       if( not is_printable( row_elements[icol] ) ):
         print('Error: non-printable character(s) in row %d column %d' % ( irow, icol + 1 ))
         errorFlag = True
@@ -942,7 +942,7 @@ def parse_rows( string_in, element_coordinates = [ None, None ] ):
         row2 = mobj.group( 3 )
         row2_index = well_to_index( 1, row2, 1, True, element_coordinates )
         if( row2_index < row1_index ):
-          print( 'Error: spreadsheet cell: %s%s: bad row range: \'%\'' % ( element_coordinates[0], element_coordinates[1], string_in ), file=sys.stderr )
+          print( 'Error: spreadsheet cell: %s%s: bad row range: \'%s\'' % ( element_coordinates[0], element_coordinates[1], string_in ), file=sys.stderr )
           sys.exit( -1 )
       index1 = row1_index
       index2 = row2_index + 11
@@ -1027,7 +1027,7 @@ def parse_sample_flags(string_in, element_coordinates ):
 def parse_lanes(string_in, element_coordinates ):
   lane_list = []
   for lane_range in string_in.split( ',' ):
-    mobj = re.match(r'([0-9]?)([-:]([0-9]))?$', lane_range.strip())
+    mobj = re.match(r'([0-9]+)([-:]([0-9]+))?$', lane_range.strip())
     if( not mobj ):
       print( 'Error: spreadsheet cell: %s%s: bad lane specification: \'%s\'' % ( element_coordinates[0], element_coordinates[1], lane_range ) )
       sys.exit( -1 )
@@ -1488,7 +1488,7 @@ def check_lane_sample_consistency( column_name_list, samplesheet_row_list ):
     print('    ** no problems noticed **')
 
   if(error_flag_1 == True or error_flag_2 == True):
-    sys.exit(0)
+    sys.exit(-1)
 
 
 def check_process_groups(column_name_list, samplesheet_row_list ):
@@ -1564,7 +1564,7 @@ def expand_rows( string_in, element_coordinates = [ None, None ] ):
     if( mobj.group( 2 ) ):
       icode_row2 = ord(mobj.group( 3 ))
       if( icode_row2 < icode_row1 ):
-        print( 'Error: spreadsheet cell: %s%s: bad row range: \'%\'' % ( element_coordinates[0], element_coordinates[1], string_in ), file=sys.stderr )
+        print( 'Error: spreadsheet cell: %s%s: bad row range: \'%s\'' % ( element_coordinates[0], element_coordinates[1], string_in ), file=sys.stderr )
         sys.exit( -1 )
     for icode in range(icode_row1, icode_row2+1):
       row_list.append(chr(icode))
@@ -1596,12 +1596,12 @@ def expand_columns( string_in, element_coordinates = [ None, None ] ):
     icol_col1 = int( mobj.group( 1 ) )
     icol_col2 = icol_col1
     if( icol_col1 < 0 or icol_col1 > 12 ):
-      print( 'Error: spreadsheet cell: %s%s: bad column value: \'%d\'' % ( element_coordinates[0], element_coordinates[1], col1 ), file=sys.stderr )
+      print( 'Error: spreadsheet cell: %s%s: bad column value: \'%d\'' % ( element_coordinates[0], element_coordinates[1], icol_col1 ), file=sys.stderr )
       sys.exit( -1 )
     if( mobj.group( 2 ) ):
       icol_col2 = int( mobj.group( 3 ) )
       if( icol_col2 < 0 or icol_col2 > 12 ):
-        print( 'Error: spreadsheet cell: %s%s: bad column value: \'%d\'' % ( element_coordinates[0], element_coordinates[1], col1 ), file=sys.stderr )
+        print( 'Error: spreadsheet cell: %s%s: bad column value: \'%d\'' % ( element_coordinates[0], element_coordinates[1], icol_col2 ), file=sys.stderr )
         sys.exit( -1 )
       if( icol_col2 < icol_col1 ):
         print( 'Error: spreadsheet cell: %s%s: bad column range: \'%s\'' % ( element_coordinates[0], element_coordinates[1], string_in ), file=sys.stderr )
