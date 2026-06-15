@@ -83,7 +83,7 @@ def check_header(row):
 
 
 # Read the LIMS manifest CSV file.
-def read_lims_manifest(rows):
+def read_lims_manifest(infile):
   rows = []
   with open(infile, newline='') as ifp:
     reader = csv.reader(ifp, dialect='unix')
@@ -109,6 +109,7 @@ def store_row_values_dicts(header_row, inrows):
     mobj = pobj.match(well_coordinate)
     if(mobj == None):
       print('Unable to match well coordinate \'%s\'' % (well_coordinate), file=sys.stderr)
+      sys.exit(-1)
     dict_tmp['rt_well'] = '%s-%s%02d' % (plate, mobj.group(1), int(mobj.group(2)))
     inrows_dicts.append(dict_tmp)
   return(inrows_dicts)
