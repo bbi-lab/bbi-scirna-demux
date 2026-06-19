@@ -23,17 +23,6 @@ params.ligation_barcode_file_default = "$workflow.projectDir/data/ligation.txt"
 
 
 /*
-** Set up channels.
-*/
-samplesheet_file = channel.value(params.samplesheet_json)
-illumina_run_dir = channel.value(params.illumina_run_dir)
-p7_barcode_file_default = channel.value(params.p7_barcode_file_default)
-p5_barcode_file_default = channel.value(params.p5_barcode_file_default)
-rt_barcode_file_default = channel.value(params.rt_barcode_file_default)
-ligation_barcode_file_default = channel.value(params.ligation_barcode_file_default)
-
-
-/*
 ** Import modules after defining params.* so that
 ** the parameters are accessible in the modules.
 */
@@ -46,6 +35,13 @@ include { run_rna_rtlig_demux } from './modules/run_rna_rtlig_demux.nf'
 ** Run pipeline.
 */
 workflow {
+  def samplesheet_file = channel.value(params.samplesheet_json)
+  def illumina_run_dir = channel.value(params.illumina_run_dir)
+  def p7_barcode_file_default = channel.value(params.p7_barcode_file_default)
+  def p5_barcode_file_default = channel.value(params.p5_barcode_file_default)
+  def rt_barcode_file_default = channel.value(params.rt_barcode_file_default)
+  def ligation_barcode_file_default = channel.value(params.ligation_barcode_file_default)
+
   run_check_samplesheet(samplesheet_file)
   run_bclconvert(samplesheet_file, illumina_run_dir, p7_barcode_file_default, p5_barcode_file_default, params.p5_revcmp)
   run_bclconvert.out.flatMap{ make_pairwise_fastq_bclconvert(it) }.set{fastq_pairs}
