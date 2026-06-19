@@ -556,7 +556,7 @@ def clean_samplesheet_data( column_name_list, samplesheet_row_list ):
         print('Error: non-printable character(s) in row %d column %d' % ( irow, icol + 1 ))
         errorFlag = True
   if( errorFlag ):
-    sys.exit( -1 )
+    sys.exit( 1 )
 
 
 def check_args( args ):
@@ -567,7 +567,7 @@ def check_args( args ):
   if( len( error_string ) > 0 ):
     print( 'Command line argument errors:' )
     print( error_string, file=sys.stderr )
-    sys.exit( -1 )
+    sys.exit( 1 )
   return( 0 )
 
 
@@ -646,7 +646,7 @@ def check_header_column_names( column_name_list ):
       print( 'Error: column for \'%s\' occurs %d times.' % ( column_name, columns_allowed[column_name] ), file=sys.stderr )
       errorFlag = 1
   if( errorFlag ):
-    sys.exit( -1 )
+    sys.exit( 1 )
   p5_col = False
   p7_row = False
   for column_name_dict in column_name_list:
@@ -656,7 +656,7 @@ def check_header_column_names( column_name_list ):
       p7_row = True
   if( p5_col != p7_row ):
     print( 'Error: p5 is %sin \'columns\' format but p7 is %sin \'rows\' format' % ( '' if p5_col else 'not ', '' if p7_row else 'not ' ), file=sys.stderr )
-    sys.exit( -1 )
+    sys.exit( 1 )
   return( 0 )
 
 
@@ -675,7 +675,7 @@ def parse_header( row_header ):
     column_name_list, error_string = parse_header_column_name( str, column_name_list, error_string )
   if(len(error_string) > 0):
     print('Error: invalid header label(s): %s' % (error_string))
-    sys.exit(-1)
+    sys.exit(1)
   check_header_column_names( column_name_list )
   return( column_name_list )
 
@@ -700,7 +700,7 @@ def well_to_index( plate, row, column, across_row_first=True, element_coordinate
       not row in [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' ] or
       column < 1 or column > 12 ):
     print( 'Error: spreadsheet cell: %s%s:  bad well values: plate: %d  row: %s  col: %d' % ( element_coordinates[0], element_coordinates[1], plate, row, column ), file=sys.stderr )
-    sys.exit( -1 )
+    sys.exit( 1 )
   irow = ord( row ) - ord( 'a' )
   icol = column - 1
   if( across_row_first ):
@@ -749,7 +749,7 @@ def index_string_to_well_string( index_string, across_row_first, show_plate ):
     mobj = re.match( r'^([0-9]+)([-]([0-9]+))?$', item.strip() )
     if( mobj == None):
       print('Error: index_string_to_well_string: unable to parse index string', file=sys.stderr)
-      sys.exit(-1)
+      sys.exit(1)
     ipl, well = index_to_well(int( mobj.group( 1 ) ) - 1, across_row_first)
     if( ipl == 0 and not show_plate ):
       if( len( well_string ) > 0 ):
@@ -874,7 +874,7 @@ def parse_wells( string_in, across_row_first=True, element_coordinates = [ None,
       col1 = int( mobj.group( 4 ) )
       if( col1 < 1 or col1 > 12 ):
         print( 'Error: spreadsheet cell: %s%s: bad well: \'%s\'' % ( element_coordinates[0], element_coordinates[1], string_in ), file=sys.stderr )
-        sys.exit( -1 )
+        sys.exit( 1 )
       # is plate specified?
       if( mobj.group( 1 ) ):
         plate1_list = [ int( mobj.group( 2 ) ) ]
@@ -884,13 +884,13 @@ def parse_wells( string_in, across_row_first=True, element_coordinates = [ None,
       if( mobj.group( 5 ) ):
         if( ( mobj.group( 2 ) == None ) != ( mobj.group( 7 ) == None ) ):
           print( 'Error: spreadsheet cell: %s%s: either both or neither well in a range must have plates specified: \'%s\'' % ( element_coordinates[0], element_coordinates[1], string_in ), file=sys.stderr )
-          sys.exit( -1 )
+          sys.exit( 1 )
         # second well, if this is a range
         row2 = mobj.group( 8 )
         col2 = int( mobj.group( 9 ) )
         if( col2 < 1 or col2 > 12 ):
           print( 'Error: spreadsheet cell: %s%s: bad well: \'%s\'' % ( element_coordinates[0], element_coordinates[1], string_in ), file=sys.stderr )
-          sys.exit( -1 )
+          sys.exit( 1 )
         # is plate specified?
         if( mobj.group( 6 ) ):
           plate2_list = [ int( mobj.group( 7 ) ) ]
@@ -907,7 +907,7 @@ def parse_wells( string_in, across_row_first=True, element_coordinates = [ None,
         index2 = well_to_index( plate2, row2, col2, across_row_first, element_coordinates )
         if( index2 < index1 ):
           print( 'Error: spreadsheet cell: %s%s: bad well range: \'%s\'' % ( element_coordinates[0], element_coordinates[1], string_in ), file=sys.stderr )
-          sys.exit( -1 )
+          sys.exit( 1 )
         for i in range( index1, index2 + 1 ):
           index_list.append( i )
 
@@ -916,7 +916,7 @@ def parse_wells( string_in, across_row_first=True, element_coordinates = [ None,
     else:
       if( not mobj ):
         print( 'Error: spreadsheet cell: %s%s: bad well or well range \'%s\'' % ( element_coordinates[0], element_coordinates[1], well_range ), file=sys.stderr )
-        sys.exit( -1 )
+        sys.exit( 1 )
   return( check_index_list( 'well', index_list, element_coordinates ) )
 
 
@@ -943,7 +943,7 @@ def parse_rows( string_in, element_coordinates = [ None, None ] ):
         row2_index = well_to_index( 1, row2, 1, True, element_coordinates )
         if( row2_index < row1_index ):
           print( 'Error: spreadsheet cell: %s%s: bad row range: \'%s\'' % ( element_coordinates[0], element_coordinates[1], string_in ), file=sys.stderr )
-          sys.exit( -1 )
+          sys.exit( 1 )
       index1 = row1_index
       index2 = row2_index + 11
       for i in range( index1, index2 + 1 ):
@@ -954,7 +954,7 @@ def parse_rows( string_in, element_coordinates = [ None, None ] ):
     else:
       if( not mobj ):
         print( 'Error: spreadsheet cell: %s%s: bad row or row range \'%s\'' % ( element_coordinates[0], element_coordinates[1], row_range ), file=sys.stderr )
-        sys.exit( -1 )
+        sys.exit( 1 )
   return( check_index_list( 'row', index_list, element_coordinates ) )
 
 
@@ -982,15 +982,15 @@ def parse_columns( string_in, element_coordinates = [ None, None ] ):
       col2_index = col1_index
       if( col1 < 1 or col1 > 12 ):
         print( 'Error: spreadsheet cell: %s%s: bad column value: \'%d\'' % ( element_coordinates[0], element_coordinates[1], col1 ), file=sys.stderr )
-        sys.exit( -1 )
+        sys.exit( 1 )
       if( mobj.group( 2 ) ):
         col2 = int( mobj.group( 3 ) )
         if( col2 < 1 or col2 > 12 ):
           print( 'Error: spreadsheet cell: %s%s: bad column value: \'%d\'' % ( element_coordinates[0], element_coordinates[1], col1 ), file=sys.stderr )
-          sys.exit( -1 )
+          sys.exit( 1 )
         if( col2 < col1 ):
           print( 'Error: spreadsheet cell: %s%s: bad column range: \'%s\'' % ( element_coordinates[0], element_coordinates[1], string_in ), file=sys.stderr )
-          sys.exit( -1 )
+          sys.exit( 1 )
         col2_index = well_to_index( 1, 'A', col2, False, element_coordinates )
       index1 = col1_index
       index2 = col2_index + 7
@@ -1002,7 +1002,7 @@ def parse_columns( string_in, element_coordinates = [ None, None ] ):
     else:
       if( not mobj ):
         print( '2 Error 1: spreadsheet cell: %s%s: bad column or column range \'%s\'' % ( element_coordinates[0], element_coordinates[1], col_range ), file=sys.stderr )
-        sys.exit( -1 )
+        sys.exit( 1 )
   return( check_index_list( 'column', index_list, element_coordinates ) )
 
 
@@ -1014,7 +1014,7 @@ def parse_sample_flags(string_in, element_coordinates ):
     mobj = re.match( sample_flags_re_pattern, sample_flag.strip() )
     if( not mobj ):
       print( 'Error: spreadsheet cell: %s%s: bad sample flag specification: \'%s\'' % ( element_coordinates[0], element_coordinates[1], sample_flag ) )
-      sys.exit( -1 )
+      sys.exit( 1 )
     sample_flag_list.append( sample_flag )
   return( sample_flag_list )
 
@@ -1030,7 +1030,7 @@ def parse_lanes(string_in, element_coordinates ):
     mobj = re.match(r'([0-9]+)([-:]([0-9]+))?$', lane_range.strip())
     if( not mobj ):
       print( 'Error: spreadsheet cell: %s%s: bad lane specification: \'%s\'' % ( element_coordinates[0], element_coordinates[1], lane_range ) )
-      sys.exit( -1 )
+      sys.exit( 1 )
     if( mobj.group( 1 ) != '' ):
       lane1_index = int( mobj.group( 1 ) )
     else:
@@ -1038,12 +1038,12 @@ def parse_lanes(string_in, element_coordinates ):
     lane2_index = lane1_index
     if( lane1_index < 0 ):
       print( 'Error: spreadsheet cell: %s%s: bad lane value: \'%d\'' % ( element_coordinates[0], element_coordinates[1], lane1_index ), file=sys.stderr)
-      sys.exit( -1 )
+      sys.exit( 1 )
     if( mobj.group( 2 ) ):
       lane2_index = int( mobj.group( 3 ) )
       if( lane2_index <= lane1_index ):
         print( 'Error: spreadsheet cell: %s%s: bad lane value: \'%d\'' % ( element_coordinates[0], element_coordinates[1], lane2_index ), file=sys.stderr)
-        sys.exit( -1 )
+        sys.exit( 1 )
     for i in range( lane1_index, lane2_index + 1 ):
       lane_list.append( i )
   return( check_index_list( 'lane', lane_list, element_coordinates ) )
@@ -1065,7 +1065,7 @@ def check_rows( column_name_list, csv_rows ):
   for irow, row_elements in enumerate( csv_rows ):
     if(len(row_elements) < num_col):
       print('Error: missing %d cell(s) in row %d' % ( num_col - len(row_elements), irow))
-      sys.exit( -1 )
+      sys.exit( 1 )
     # Number of cells that are supposed to have
     # content but don't.
     num_empty = 0 
@@ -1086,7 +1086,7 @@ def check_rows( column_name_list, csv_rows ):
       # Note: we allow for an empty row with
       #       num_empty == num_col.
       print( 'Error: row %d has empty cells' % ( irow + 1 ) )
-      sys.exit( -1 )
+      sys.exit( 1 )
   return( csv_rows_out )
 
 
@@ -1135,7 +1135,7 @@ def check_sample_names( column_name_list, samplesheet_row_list ):
       mobj = re.match( r'[a-zA-Z0-9]', element_string.strip() )
       if( not mobj ):
         print( 'Error: sample names must begin with an alphanumeric character', file=sys.stderr )
-        sys.exit( -1 )
+        sys.exit( 1 )
       # Convert invalid characters to periods.
       row_elements[i] = re.sub( r'[^a-zA-Z0-9.]', '.', element_string )
 #      sample_name_out_dict.setdefault( element_string, True )
@@ -1148,7 +1148,7 @@ def check_sample_names( column_name_list, samplesheet_row_list ):
     print( 'Error: unacceptable names are not distinct after editing', file=sys.stderr )
     errorFlag = True
   if( errorFlag ):
-    sys.exit( -1 )
+    sys.exit( 1 )
   # Check barnyard sample name. (This is unnecessary, I believe.)
 #   for row_elements in samplesheet_row_list:
 #     for i in range( len( row_elements ) ):
@@ -1190,7 +1190,7 @@ def check_genome_names( column_name_list, samplesheet_row_list ):
     for missing_genome_name in bad_row_dict.keys():
       print( '  \'%s\'' % ( missing_genome_name ), file=sys.stderr )
   if( errorFlag ):
-    sys.exit( -1 )
+    sys.exit( 1 )
   return( 0 )
 
 
@@ -1224,7 +1224,7 @@ def check_external_sample_name( column_name_list, samplesheet_row_list ):
     print( 'Error: unacceptable names are not distinct after editing', file=sys.stderr )
     errorFlag = True
   if( errorFlag ):
-    sys.exit( -1 )
+    sys.exit( 1 )
   return( samplesheet_row_list )
 
 
@@ -1250,7 +1250,7 @@ def check_tissue( column_name_list, samplesheet_row_list ):
     print('  Row\tCell')
     for irow in bad_row_dict.keys():
       print( '  %s\t\'%s\'' % ( irow, bad_row_dict[irow] ) )
-    sys.exit( -1 )
+    sys.exit( 1 )
   return( samplesheet_row_list )
 
 
@@ -1275,7 +1275,7 @@ def check_wrap_group( column_name_list, samplesheet_row_list ):
     print('  Row\tCell')
     for irow in bad_row_dict.keys():
       print( '  %s\t\'%s\'' % ( irow, bad_row_dict[irow] ) )
-    sys.exit( -1 )
+    sys.exit( 1 )
   return( 0 )
 
 
@@ -1302,7 +1302,7 @@ def check_lanes( column_name_list, samplesheet_row_list ):
     print('  Row\tCell')
     for irow in bad_row_dict.keys():
       print( '  %s\t\'%s\'' % ( irow, bad_row_dict[irow] ) )
-    sys.exit( -1 )
+    sys.exit( 1 )
   return( 0 )
 
 
@@ -1326,7 +1326,7 @@ def check_hash_file( column_name_list, samplesheet_row_list ):
     print('  Row\tCell')
     for irow in bad_row_dict.keys():
       print( '  %s\t\'%s\'' % ( irow, bad_row_dict[irow] ) )
-    sys.exit( -1 )
+    sys.exit( 1 )
   return( 0 )
 
 
@@ -1359,7 +1359,7 @@ def check_barcode_files( column_name_list, samplesheet_row_list ):
     print('  Row\tCell')
     for irow in bad_row_dict.keys():
       print( '  %s\t\'%s\'' % ( irow, bad_row_dict[irow] ) )
-    sys.exit( -1 )
+    sys.exit( 1 )
   return( 0 )
 
 
@@ -1488,7 +1488,7 @@ def check_lane_sample_consistency( column_name_list, samplesheet_row_list ):
     print('    ** no problems noticed **')
 
   if(error_flag_1 == True or error_flag_2 == True):
-    sys.exit(-1)
+    sys.exit(1)
 
 
 def check_process_groups(column_name_list, samplesheet_row_list ):
@@ -1519,7 +1519,7 @@ def check_process_groups(column_name_list, samplesheet_row_list ):
     print('  Row\tCell')
     for irow in bad_row_dict.keys():
       print( '  %s\t\'%s\'' % ( irow, bad_row_dict[irow] ) )
-    sys.exit( -1 )
+    sys.exit( 1 )
 
   # check that the integer values start with 1 and are
   # sequential
@@ -1534,10 +1534,10 @@ def check_process_groups(column_name_list, samplesheet_row_list ):
   process_group_list_sorted = sorted(list(process_group_set))
   if(min(process_group_list_sorted) != 1):
     print('Minimum process_group value is not 1')
-    sys.exit(-1)
+    sys.exit(1)
   if(process_group_list_sorted != list(range(min(process_group_list_sorted), max(process_group_list_sorted)+1))):
     print('Process group values are not sequential')
-    sys.exit(-1)
+    sys.exit(1)
   return(0)
 
 
@@ -1558,14 +1558,14 @@ def expand_rows( string_in, element_coordinates = [ None, None ] ):
     mobj = re.match( p7_re_row_pattern_2, row_range.strip() )
     if( not mobj ):
       print( 'Error: spreadsheet cell: %s%s: bad row or row range \'%s\'' % ( element_coordinates[0], element_coordinates[1], row_range ), file=sys.stderr )
-      sys.exit( -1 )
+      sys.exit( 1 )
     icode_row1 = ord(mobj.group( 1 ))
     icode_row2 = icode_row1
     if( mobj.group( 2 ) ):
       icode_row2 = ord(mobj.group( 3 ))
       if( icode_row2 < icode_row1 ):
         print( 'Error: spreadsheet cell: %s%s: bad row range: \'%s\'' % ( element_coordinates[0], element_coordinates[1], string_in ), file=sys.stderr )
-        sys.exit( -1 )
+        sys.exit( 1 )
     for icode in range(icode_row1, icode_row2+1):
       row_list.append(chr(icode))
   return(row_list)
@@ -1591,21 +1591,21 @@ def expand_columns( string_in, element_coordinates = [ None, None ] ):
     mobj = re.match( p5_re_col_pattern_2, col_range.strip() )
     if( not mobj ):
       print( '1 Error: spreadsheet cell: %s%s: bad column or column range \'%s\'' % ( element_coordinates[0], element_coordinates[1], col_range ), file=sys.stderr )
-      sys.exit( -1 )
+      sys.exit( 1 )
 
     icol_col1 = int( mobj.group( 1 ) )
     icol_col2 = icol_col1
     if( icol_col1 < 0 or icol_col1 > 12 ):
       print( 'Error: spreadsheet cell: %s%s: bad column value: \'%d\'' % ( element_coordinates[0], element_coordinates[1], icol_col1 ), file=sys.stderr )
-      sys.exit( -1 )
+      sys.exit( 1 )
     if( mobj.group( 2 ) ):
       icol_col2 = int( mobj.group( 3 ) )
       if( icol_col2 < 0 or icol_col2 > 12 ):
         print( 'Error: spreadsheet cell: %s%s: bad column value: \'%d\'' % ( element_coordinates[0], element_coordinates[1], icol_col2 ), file=sys.stderr )
-        sys.exit( -1 )
+        sys.exit( 1 )
       if( icol_col2 < icol_col1 ):
         print( 'Error: spreadsheet cell: %s%s: bad column range: \'%s\'' % ( element_coordinates[0], element_coordinates[1], string_in ), file=sys.stderr )
-        sys.exit( -1 )
+        sys.exit( 1 )
     for i in range( icol_col1, icol_col2 + 1 ):
       column_list.append(str(i))
   return(column_list)
@@ -1658,7 +1658,7 @@ def expand_sample_rows(column_name_list, samplesheet_row_list):
     column_list = expand_columns(samplesheet_row[pcr5_column], element_coordinates = element_coordinates)
     if(len(row_list) != len(column_list)):
       print('Error: number of rows is not equal to number of columns in sample sheet row %d' % (irow + 2))
-      sys.exit(-1)
+      sys.exit(1)
     num_expand = len(row_list)
     for iexpand in range(num_expand):
       element_list = []
@@ -1685,7 +1685,7 @@ def set_default_lanes_value( row_out_list, number_lanes ):
     if( ( len( sample_dict['lanes'] ) >  0 and zero_length_flag == True) or
         ( len( sample_dict['lanes'] ) == 0 and zero_length_flag == False ) ):
       print('Error: mix of lanes with and without lane specifications', file=sys.stderr)
-      sys.exit(-1)
+      sys.exit(1)
 
   #
   # Set lanes to all lanes if zero_length_flag is True. Otherwise,
@@ -1707,7 +1707,7 @@ def make_samplesheet_indexes( column_name_list, samplesheet_row_list, number_lan
   for irow, row_elements in enumerate( samplesheet_row_list ):
     if( len( row_elements ) < num_col ):
       print( 'Error: missing cells in row %d: %s' % ( irow + 1, ', '.join('"{0}"'.format(e) for e in row_elements ) ), file=sys.stderr )
-      sys.exit( -1 )
+      sys.exit( 1 )
     icol = 0
     # Initialize optional column values.
     external_sample_name = ''
@@ -1735,7 +1735,7 @@ def make_samplesheet_indexes( column_name_list, samplesheet_row_list, number_lan
           p7_index_list = parse_rows( element_string, element_coordinates )
         else:
           print( 'Error: unexpected P7 format', file=sys.stderr )
-          sys.exit( -1 )
+          sys.exit( 1 )
       elif( column_name_dict['type'] == 'p5' ):
         if( column_name_dict['format'] == 'wells' ):
           p5_index_list = parse_wells( element_string, False, element_coordinates )
@@ -1743,7 +1743,7 @@ def make_samplesheet_indexes( column_name_list, samplesheet_row_list, number_lan
           p5_index_list = parse_columns( element_string, element_coordinates )
         else:
           print( 'Error: unexpected P5 format', file=sys.stderr )
-          sys.exit( -1 )
+          sys.exit( 1 )
       elif( column_name_dict['type'] == 'sample_name' ):
           sample_name = element_string
       elif( column_name_dict['type'] == 'genome' ):
@@ -1806,7 +1806,7 @@ def check_pcr_indexes( row_out_list ):
   for irow, row_out in enumerate( row_out_list ):
     if( row_out['p7_index_list'] == [0] and row_out['p5_index_list'] == [0] ):
       print( 'Error: row %d: both p7 and p5 well indices are 0' % ( irow + 2 ) )
-      sys.exit( -1 )
+      sys.exit( 1 )
 
 # OK
 def dump_row_out_list( row_out_list ):
@@ -1855,7 +1855,7 @@ def get_pcr_row_col( column_name_list, samplesheet_row_list ):
       mobj = re.match( p5_re_col_pattern_2, value_range.strip() )
       if( not mobj ):
         print( 'Error: bad value or value range \'%s\'' % ( value_range ), file=sys.stderr )
-        sys.exit( -1 )
+        sys.exit( 1 )
       col1 = int( mobj.group( 1 ) )
       col2 = col1
       if( mobj.group( 2 ) ):
@@ -1869,7 +1869,7 @@ def get_pcr_row_col( column_name_list, samplesheet_row_list ):
       mobj = re.match( p7_re_row_pattern_2, value_range.strip() )
       if( not mobj ):
         print( 'Error: bad value or value range \'%s\'' % ( value_range ), file=sys.stderr )
-        sys.exit( -1 )
+        sys.exit( 1 )
       row1 = mobj.group( 1 )
       row2 = row1
       if( mobj.group( 2 ) ):
@@ -1923,7 +1923,7 @@ def get_pcr_wells( column_name_list, samplesheet_row_list ):
         col2 = col1
         if( col1 < 1 or col1 > 12 ):
           print( 'Error: bad well: \'%s\'' % ( value_range ), file=sys.stderr )
-          sys.exit( -1 )
+          sys.exit( 1 )
         if( mobj.group( 5 ) ):
           # second well, if this is a range
           row2 = mobj.group( 8 )
@@ -1939,7 +1939,7 @@ def get_pcr_wells( column_name_list, samplesheet_row_list ):
       else:
         if( not mobj ):
           print( 'Error: bad well or well range \'%s\'' % ( value_range ), file=sys.stderr )
-          sys.exit( -1 )
+          sys.exit( 1 )
 
     p7_samplesheet_row_list = []
     for value_range in samplesheet_row[p7_samplesheet_col].split( ',' ):
@@ -1954,7 +1954,7 @@ def get_pcr_wells( column_name_list, samplesheet_row_list ):
         col2 = col1
         if( col1 < 1 or col1 > 12 ):
           print( 'Error: bad well: \'%s\'' % ( value_range ), file=sys.stderr )
-          sys.exit( -1 )
+          sys.exit( 1 )
         if( mobj.group( 5 ) ):
           # second well, if this is a range
           row2 = mobj.group( 8 )
@@ -1970,7 +1970,7 @@ def get_pcr_wells( column_name_list, samplesheet_row_list ):
       else:
         if( not mobj ):
           print( 'Error: bad well or well range \'%s\'' % ( value_range ), file=sys.stderr )
-          sys.exit( -1 )
+          sys.exit( 1 )
     pair_samplesheet_row_list.append( [ p5_samplesheet_row_list, p7_samplesheet_row_list ] )
 
   pair_list_dict = {}
@@ -2391,7 +2391,7 @@ if __name__ == '__main__':
   if( len( error_string ) > 0 ):
     print( 'Error: missing command line parameters\n%s' % ( error_string ) )
     print( 'For help run \'scirna_samplesheet.py -h\' or \'scirna_samplesheet.py -d\'' )
-    sys.exit( -1 )
+    sys.exit( 1 )
 
   #
   # Check command line parameter consistency.

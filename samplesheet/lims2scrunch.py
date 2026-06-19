@@ -79,7 +79,7 @@ def check_header(row):
      row[10] != 'tissue' or
      row[11] != 'genome'):
     print('Error: unexpected header token in row: ', row, file=sys.stderr)
-    sys.exit(-1)
+    sys.exit(1)
 
 
 # Read the LIMS manifest CSV file.
@@ -109,7 +109,7 @@ def store_row_values_dicts(header_row, inrows):
     mobj = pobj.match(well_coordinate)
     if(mobj == None):
       print('Unable to match well coordinate \'%s\'' % (well_coordinate), file=sys.stderr)
-      sys.exit(-1)
+      sys.exit(1)
     dict_tmp['rt_well'] = '%s-%s%02d' % (plate, mobj.group(1), int(mobj.group(2)))
     inrows_dicts.append(dict_tmp)
   return(inrows_dicts)
@@ -222,7 +222,7 @@ def read_parameter_file(filename):
         parameter_dict[key] = parts[1]
       else:
         print('Error: unrecognized parameter (%s) in parameter file %s' % (key, filename), file=sys.stderr)
-        sys.exit(-1)
+        sys.exit(1)
   print('parameter_dict: ')
   print(parameter_dict)
   return(parameter_dict)
