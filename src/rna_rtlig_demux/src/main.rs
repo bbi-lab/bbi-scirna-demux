@@ -1532,7 +1532,7 @@ fn main() {
                         num_threads,
                         &well_index_to_sample_index_map,
                         &sample_index_to_name_map,
-                        &mut log_read_counts);
+                        &mut log_read_counts).expect("Error: bad status: process_reads");
 
   /*
   ** Write log file.
