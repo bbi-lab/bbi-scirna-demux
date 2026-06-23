@@ -63,7 +63,7 @@ use chrono;
 ** Define command line arguments.
 */
 fn set_cl_options() -> Result<clap::Command, Box<dyn Error>> {
-  let cl_options = Command::new("process_hashes")
+  let cl_options = Command::new("rna_rtlig_demux")
         .version(env!("CARGO_PKG_VERSION"))
         .about("Demultiplex fastq files on RT and ligation barcodes.")
         .arg(Arg::new("fastq_read_1")   //required=true, no default
