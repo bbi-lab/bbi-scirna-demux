@@ -63,7 +63,7 @@ use chrono;
 ** Define command line arguments.
 */
 fn set_cl_options() -> Result<clap::Command, Box<dyn Error>> {
-  let cl_options = Command::new("process_hashes")
+  let cl_options = Command::new("rna_rtlig_demux")
         .version(env!("CARGO_PKG_VERSION"))
         .about("Demultiplex fastq files on RT and ligation barcodes.")
         .arg(Arg::new("fastq_read_1")   //required=true, no default
@@ -1532,7 +1532,7 @@ fn main() {
                         num_threads,
                         &well_index_to_sample_index_map,
                         &sample_index_to_name_map,
-                        &mut log_read_counts);
+                        &mut log_read_counts).expect("Error: bad status: process_reads");
 
   /*
   ** Write log file.

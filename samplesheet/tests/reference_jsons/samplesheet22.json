@@ -1,0 +1,26 @@
+{
+    "json_file_version": "2.0.0",
+    "sequencer_class": "illumina",
+    "sequencer_run_directory": null,
+    "level": 3,
+    "number_lanes": 4,
+    "sample_index_list": [
+        {
+            "sample_id": "sample.1",
+            "ranges": "1-4,27-33:10:10",
+            "lanes": "1-4",
+            "tissue": "brain",
+            "genome": "mouse",
+            "hash_file": "",
+            "sample_flags": "",
+            "external_sample_name": "extsample.1",
+            "wrap_group": "Smith",
+            "rt_file": "",
+            "ligation_file": "",
+            "p7_file": "",
+            "p5_file": "",
+            "library": "",
+            "process_group": "1"
+        }
+    ]
+}
