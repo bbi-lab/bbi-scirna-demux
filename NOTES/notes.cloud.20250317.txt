@@ -1,4 +1,0 @@
-== Cumulus workflows and Docker files.
-
-https://cumulus.readthedocs.io/en/latest/index.html
-
