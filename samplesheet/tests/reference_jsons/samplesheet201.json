@@ -1,0 +1,43 @@
+{
+    "json_file_version": "2.0.0",
+    "sequencer_class": "illumina",
+    "sequencer_run_directory": null,
+    "level": 3,
+    "number_lanes": 4,
+    "sample_index_list": [
+        {
+            "sample_id": "sample.1",
+            "ranges": "1-4:98:98",
+            "lanes": "1",
+            "tissue": "brain",
+            "genome": "mouse",
+            "hash_file": "",
+            "sample_flags": "B",
+            "external_sample_name": "extsample.1",
+            "wrap_group": "Smith",
+            "rt_file": "",
+            "ligation_file": "",
+            "p7_file": "/net/bbi/vol1/data/bge/bbi/tests/p7a.txt",
+            "p5_file": "/net/bbi/vol1/data/bge/bbi/tests/p5a.txt",
+            "library": "",
+            "process_group": "1"
+        },
+        {
+            "sample_id": "sample.2",
+            "ranges": "1-4:12:8",
+            "lanes": "2",
+            "tissue": "brain",
+            "genome": "mouse",
+            "hash_file": "",
+            "sample_flags": "B",
+            "external_sample_name": "extsample.2",
+            "wrap_group": "Smith",
+            "rt_file": "",
+            "ligation_file": "",
+            "p7_file": "/net/bbi/vol1/data/bge/bbi/tests/p7b.txt",
+            "p5_file": "/net/bbi/vol1/data/bge/bbi/tests/p5b.txt",
+            "library": "",
+            "process_group": "1"
+        }
+    ]
+}

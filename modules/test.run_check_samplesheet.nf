@@ -1,0 +1,18 @@
+process run_check_samplesheet {
+  cache 'lenient'
+
+  input:
+    val samplesheet_json
+
+  script:
+  """
+  # bash watch for errors
+  set -ueo pipefail
+
+  /net/gs/vol1/home/bge/git/bbi-scirna-demux/bin/check_samplesheet_json.py -i ${samplesheet_json}
+#  $workflow.projectDir/bin/check_samplesheet_json.py -i ${samplesheet_json}
+ 
+  """
+}
+
+

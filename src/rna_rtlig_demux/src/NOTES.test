@@ -1,0 +1,54 @@
+== Test rna_rtlig_demux
+
+o  test command line options
+     o  rt_barcode_file
+     o  ligation_barcode_file
+     o  uncompressed_fastqs
+     o  number_bam_threads
+     o  output_file_format
+
+o  get_file_indices()
+
+o  make_well_index_map()
+
+o  make_index_well_map()
+
+o  make_index_encoder()
+
+o  get_samplesheet_json()
+
+o  make_index_vec()
+
+o  deserialize_sample_map()
+
+o  deserialize_sample_map_vector()
+
+o  get sample_index_vecs()
+
+o  get_lane_samples()
+
+o  make_barcode_id_map()
+
+o  make_index_maps()
+
+o  open_reader_file()
+
+o  open_writer_file()
+
+o  open_fastq_writers()
+
+o  open_bam_writers()
+
+o  process_reads()
+
+o  writer_log_file()
+
+
+
+
+configure conditional compilation
+https://stackoverflow.com/questions/63541667/setting-arbitrary-configuration-options-using-cargo
+
+https://doc.rust-lang.org/reference/conditional-compilation.html#the-cfg-attribute
+
+#[cfg(not(foo))]

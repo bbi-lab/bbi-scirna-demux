@@ -1,0 +1,2 @@
+sample_name,genome,rt_wells,p7_rows,p5_columns,external_sample_name,tissue,wrap_group,hash_file,lanes,process_group
+sample.1,mouse,"P2-A01:P2-A04,P1-C03:P1-C09","A,C","3,8",extsample.1,brain,Smith,,1:4,1

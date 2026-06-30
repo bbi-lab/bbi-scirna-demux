@@ -1,0 +1,189 @@
+samplesheet filename    test
+--------------------    ----
+o samplesheet01.csv       rt indices: out of order wells
+o samplesheet02.csv       rt indices: no plate specifier
+o samplesheet03.csv       rt indices: one digit plate specifier
+o samplesheet04.csv       rt indices: two digit plate specifier
+o samplesheet05.csv       rt indices: lower case plate specifier
+o samplesheet06.csv       rt indices: upper case plate specifier
+o samplesheet07.csv       rt indices: lower case row specifier
+o samplesheet08.csv       rt indices: upper case row specifier
+o samplesheet09.csv       rt indices: multiple groups
+o samplesheet10.csv       rt indices: wrong well group separator
+o samplesheet11.csv       rt indices: single wells
+o samplesheet12.csv       rt indices: well ranges
+o samplesheet13.csv       rt indices: wrong well group separator (duplicate)
+o samplesheet14.csv       rt indices: wrong plate-well separator
+note: compare index values to table
+
+o samplesheet15.csv       p7 indices: out of order wells
+o samplesheet16.csv       p7 indices: out of order rows
+o samplesheet17.csv       p7 indices: lower case well specifier
+o samplesheet18.csv       p7 indices: upper case well specifier
+o samplesheet19.csv       p7 indices: lower case row specifier
+o samplesheet20.csv       p7 indices: upper case row specifier
+o samplesheet21.csv       p7 indices: row range
+o samplesheet22.csv       p7 indices: single well
+o samplesheet23.csv       p7 indices: multiple wells
+o samplesheet24.csv       p7 indices: wrong well group separator
+o samplesheet25.csv       p7 indices: single row
+o samplesheet26.csv       p7 indices: multiple rows
+o samplesheet27.csv       p7 indices: wrong row group separator
+o samplesheet28.csv       p7 indices: '0' (none) row
+o samplesheet29.csv       p7 indices: '0' (none) well
+o samplesheet29_1.csv     p7 indices: well with plate specifier
+note: compare index values to table
+
+o samplesheet30.csv       p5 indices: out of order wells
+o samplesheet31.csv       p5 indices: out of order col
+o samplesheet32.csv       p5 indices: lower case well col specifier
+o samplesheet33.csv       p5 indices: upper case well col specifier
+o samplesheet34.csv       p5 indices: col range
+o samplesheet35.csv       p5 indices: single well
+o samplesheet36.csv       p5 indices: multiple wells
+o samplesheet37.csv       p5 indices: wrong well group separator
+o samplesheet38.csv       p5 indices: single col
+o samplesheet39.csv       p5 indices: multiple col
+o samplesheet40.csv       p5 indices: wrong column group separator
+o samplesheet41.csv       p5 indices: '0' (none) col
+o samplesheet42.csv       p5 indices: '0' (none) well
+o samplesheet42_1.csv     p5 indices: well with plate specifier
+note: compare index values to table
+
+o samplesheet43.csv       p7 and p5 indices: split csv rows for multiple row and column combinations
+o samplesheet44.csv       p7 and p5 indices: inconsistent number of p7 rows and p5 columns
+o samplesheet45.csv       p7 and p5 indices: '0' (none) row and '0' (none) column
+o samplesheet46.csv       p7 and p5 indices: '0' (none) p7 wells and '0' (none) p5 wells
+
+o samplesheet47.csv       sample name: does not begin with alphanumeric character
+o samplesheet48.csv       sample name: name edits (clean-up)
+o samplesheet49.csv       sample name: post-edit name degeneracy check
+
+o samplesheet50.csv       genome name: in known genome list
+o samplesheet51.csv       genome name: not in known genome list
+
+o samplesheet52.csv       external sample name: no column
+o samplesheet53.csv       external sample name: empty cell
+o samplesheet54.csv       external sample name: bad name (no single or double quotes)
+o samplesheet55.csv       external sample name: listed in run report?
+
+o samplesheet56.csv       tissue name: no column
+o samplesheet57.csv       tissue name: empty cell
+o samplesheet58.csv       tissue name: bad name (no single or double quotes)
+o samplesheet59.csv       tissue name: listed in run report?
+
+o samplesheet60.csv       wrap group name: no column
+o samplesheet61.csv       wrap group name: empty cell
+o samplesheet62.csv       wrap group name: bad name (alphanumeric ._-)
+o samplesheet63.csv       wrap group name: listed in run report?
+
+o samplesheet64.csv       lanes: no column
+o samplesheet65.csv       lanes: error empty cell and column header exists
+o samplesheet66.csv       lanes: single lane
+o samplesheet67.csv       lanes: multiple single lanes
+o samplesheet68.csv       lanes: lane range
+o samplesheet69.csv       lanes: out-of-order lanes
+o samplesheet70.csv       lanes: listed in run report? (intentionally not listed in run report)
+o samplesheet70_1.csv     lanes: double digit lane range
+
+o samplesheet71.csv       hash file: no column
+o samplesheet72.csv       hash file: empty cell
+o samplesheet73.csv       hash file: '/home/me/hashes.txt'
+o samplesheet74.csv       hash file: test for bbi-scirna-analyze/bin/make_process_hashes_json.py
+o samplesheet75.csv       hash file: listed in run report? (intentionally not listed in run report)
+
+o samplesheet76.csv       column order: order insensitive
+
+o samplesheet77.csv       header row: name case insensitive
+o samplesheet78.csv       header row: unrecognized column name
+o samplesheet79.csv       header row: repeated column name
+
+o samplesheet80.csv       sample_flags: no flags column
+o samplesheet81.csv       sample_flags: empty cell
+o samplesheet82.csv       sample_flags: single flag
+o samplesheet83.csv       sample_flags: multiple flags
+o samplesheet84.csv       sample_flags: invalid flag
+o samplesheet85.csv       sample_flags: listed in run report?
+
+o samplesheet86.csv       rt_file: column exists and cell has path
+o samplesheet87.csv       ligation_file: column exists and cell has path
+o samplesheet88.csv       p7_file: column exists and cell has path; must be one p7 file for lane
+o samplesheet88_1.csv     p7_file: column exists and cell has path
+o samplesheet89.csv       p5_file: column exists and cell has path; must be one p5 file for lane
+o samplesheet89_1.csv     p5_file: column exists and cell has path
+
+o samplesheet90.csv       library: column exists and cell has content
+
+o samplesheet91.csv       sample_count: no lanes one sample
+o samplesheet92.csv       sample_count: no lanes two samples
+o samplesheet93.csv       sample_count: empty lanes column two samples
+o samplesheet94.csv       sample_count: one lanes spec. two samples
+o samplesheet95.csv       sample_count: two lanes spec. two samples
+o samplesheet96.csv       sample_count: two lanes spec. one sample
+
+o samplesheet97.csv       value consistency: no inconsistency
+o samplesheet98.csv       value consistency: all inconsistencies
+
+o samplesheet100.csv      multi-row csv file
+
+o samplesheet110.csv      process_group: no process_group lane
+o samplesheet111.csv      process_group: one group
+o samplesheet112.csv      process_group: two groups
+o samplesheet113.csv      process_group: error: starts with group 2
+o samplesheet114.csv      process_group: error: not sequential group values
+o samplesheet115.csv      process_group: error: empty cell
+o samplesheet116.csv      process_group: error: not integer
+o samplesheet117.csv      process_group: error: two integers in cell
+
+o samplesheet118.csv      process_group: one group and one sample with two different lanes
+
+o samplesheet120.csv      process_group: two lanes and three process groups
+
+
+** additional tests
+  extra cells in row
+  empty row
+  multiple csv row tests: same sample, different samples, collisions of some sorts?
+  pcr p7rows AND p5columns or p7wells and p5 wells  (done)
+  rt_file  (done)
+  ligation_file  (done)
+  p7_file  (done)
+  p5_file  (done)
+  two rows with the same sample name and different lanes sets <- these are considered to be different libraries
+  there can be more than one row with the same set of lanes but different p7 and/or p5 indices. Make sure that this works correctly.
+  check consistency within a library (a library consists of samples in a given set of lanes. A sample with a name that appears two or more sets of lanes is considered to be in two or more libraries.)
+    o  same p7 and p5 wells/indices
+    o  each sample in library has the same (if we allow more than one row with the same sample in the same library)
+         o  sample-specific values such as sample_flags, hash_reads, wrap_group,...
+  o  test lane+sample consistency
+       o  genome
+       o  flags
+       o  tissue, if not 'null'
+       o  wrap_group, if not 'null'
+       o  hash_reads
+       o  rt_file
+       o  ligation_file
+       o  p7_file
+       o  p5_file
+       o  library, if not 'null'
+  o  test same sample name but different lanes
+  o  test same sample in different rows
+  o  test empty row
+  o  test extra cells (more than headers)
+
+** additional work
+  o  modify sample well counts for multiple libraries by lane (done)
+
+
+Fix:
+  0 in both p7 rows and p5 columns (done)
+  0 in both p7 wells and p5 wells (done)
+  fix lanes as indexes (done)
+  samplesheet74.csv       hash reads: not 'y' (copies value: leave blank) (done)
+
+Notes:
+  o  add a check for pcr index well consistency in 'main'
+  o  what to do when more than one row as the same sample name but different external sample names (leave as is, I think)
+
+
+
