@@ -2,7 +2,7 @@
 
 ## Intro
 
-This *bbi-scirna-demux* pipeline runs the Illumina *bcl-convert* program to make *.bam* files that are demultiplexed by PCR primer pairs, followed by the *rna_rtlig_demux* program to make sample-specific pcr primer pair *.bam* files. Use the *develop* branch.
+This *bbi-scirna-demux* pipeline runs the Illumina *bcl-convert* program to make *.bam* files that are demultiplexed by PCR primer pairs, followed by the *rna_rtlig_demux* program to make sample-specific pcr primer pair *.bam* files. Use the *main* branch.
 
 ## Installation
 
