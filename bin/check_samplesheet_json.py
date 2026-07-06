@@ -372,7 +372,7 @@ def check_files_exist(sample_index_list):
 
 
 if __name__ == '__main__':
-  parser = argparse.ArgumentParser(description='A program to JSON samplesheet file.')
+  parser = argparse.ArgumentParser(description='A program to check JSON samplesheet file.')
   parser.add_argument('-i', '--input', required=True, default=None, help='Input JSON samplesheet filename (required string).')
   parser.add_argument('-v', '--version', action='version', version=program_version)
   args = parser.parse_args()
