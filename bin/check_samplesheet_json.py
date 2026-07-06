@@ -4,6 +4,7 @@ import sys
 import json
 import argparse
 import re
+from pathlib import Path
 
 
 program_version = '0.1.0'
@@ -19,6 +20,11 @@ program_version = '0.1.0'
 #   o  check for different p5 files in a process group
 #   o  check for different p7 files in a lane
 #   o  check for different p5 files in a lane
+#   o  check file existence: rt files
+#   o  check file existence: ligation files
+#   o  check file existence: p7 files
+#   o  check file existence: p5 files
+#   o  check file existence: hash files
 #
 
 
@@ -339,6 +345,32 @@ def check_file_lanes(sample_index_list, file_type):
   return(error_flag)
 
 
+def check_for_file(file_path_str):
+  file_path = Path(file_path_str)
+  if(len(file_path_str) > 0 and file_path.is_file() == False):
+    return(1)
+  return(0)
+
+
+def check_files_exist(sample_index_list):
+  file_type_list = ['rt_file', 'ligation_file', 'p7_file', 'p5_file', 'hash_file']
+  missing_file_list = list()
+  for sample_index_dict in sample_index_list:
+    for file_type in file_type_list:
+      file_path = sample_index_dict[file_type]
+      if(check_for_file(file_path) == 0):
+        continue
+      missing_file_list.append((sample_index_dict['sample_id'],file_path))
+  error_flag = False
+  if(len(missing_file_list) > 0 ):
+    error_flag = True
+    missing_file_set = set(missing_file_list)
+    print('Error: unable to read files:', file=sys.stderr)
+    for missing_file in missing_file_list:
+      print('  %s for sample %s' % (missing_file[1], missing_file[0]), file=sys.stderr)
+  return(error_flag)
+
+
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='A program to JSON samplesheet file.')
   parser.add_argument('-i', '--input', required=True, default=None, help='Input JSON samplesheet filename (required string).')
@@ -387,6 +419,10 @@ if __name__ == '__main__':
     exit_flag = 1
 
   error_flag = check_file_lanes(sample_index_list, 'p5_file')
+  if(error_flag):
+    exit_flag = 1
+
+  error_flag = check_files_exist(sample_index_list)
   if(error_flag):
     exit_flag = 1
 
