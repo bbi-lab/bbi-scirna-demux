@@ -43,7 +43,8 @@ workflow {
   def ligation_barcode_file_default = channel.value(params.ligation_barcode_file_default)
 
   run_check_samplesheet(samplesheet_file)
-  run_bclconvert(samplesheet_file, illumina_run_dir, p7_barcode_file_default, p5_barcode_file_default, params.p5_revcmp)
+  run_check_samplesheet.out.done_flag.set{check_done}
+  run_bclconvert(samplesheet_file, illumina_run_dir, p7_barcode_file_default, p5_barcode_file_default, params.p5_revcmp, check_done)
   run_bclconvert.out.flatMap{ make_pairwise_fastq_bclconvert(it) }.set{fastq_pairs}
   run_rna_rtlig_demux(fastq_pairs, samplesheet_file, rt_barcode_file_default, ligation_barcode_file_default)
 }
