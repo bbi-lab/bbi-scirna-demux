@@ -83,3 +83,9 @@ The output *.bam* files are in the directory demux_out. The *.bam* file contains
 - these (sample, process_group, pcr pair) aligned output files are merged such that all reads with the same sample_name and process_group, are written to the same output BAM file. This means that BAM files with the same sample_name and process_group, but different p7 and/or p5 barcodes, are merged. If you have samples in a lane that have the same sample_name but are from different libraries, where these samples are distinguished using different p7 and p5 barcode combinations, you must assign the samples distinct process_group values to avoid merging their reads by this stage. The merged BAM, count matrix, and statistics files are 'published' to the 'analyze_out' directory.
 - a cds file and umap.png file are made for each sample, process_group count matrix.
 - when the hash_file value is set for a sample, the untrimmed BAM files are processed to find candidate hash reads and a cds is made with the hash read information.
+
+## Notes
+
+- the samplesheet.json file includes a list of lanes to which each sample is applied. If you make a samplesheet.json file for a machine with one lane and later run the library on a machine with a different number of lanes, you must regenerate the samplesheet.json file.
+
+
