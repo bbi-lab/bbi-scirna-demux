@@ -7,6 +7,7 @@ process run_bclconvert {
     val p7_barcode_file
     val p5_barcode_file
     val p5_revcmp
+    val done_flag
 
   output:
     path "fastqs_bclconvert/*.fastq.gz"

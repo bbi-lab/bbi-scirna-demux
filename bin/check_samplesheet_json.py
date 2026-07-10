@@ -4,6 +4,7 @@ import sys
 import json
 import argparse
 import re
+from pathlib import Path
 
 
 program_version = '0.1.0'
@@ -19,6 +20,11 @@ program_version = '0.1.0'
 #   o  check for different p5 files in a process group
 #   o  check for different p7 files in a lane
 #   o  check for different p5 files in a lane
+#   o  check file existence: rt files
+#   o  check file existence: ligation files
+#   o  check file existence: p7 files
+#   o  check file existence: p5 files
+#   o  check file existence: hash files
 #
 
 
@@ -60,7 +66,7 @@ def expand_index_list(index_string):
   for index_spec in index_string.split(','):
     mobj = re.match(regex_pattern, index_spec)
     if(mobj == None):
-      print('Error: expand_index_list: bad index specification: %s' % (index_spec))
+      print('Error: expand_index_list: bad index specification: %s' % (index_spec), file=sys.stderr)
       sys.exit(1)
     index1 = int(mobj.group(1))
     index2 = index1
@@ -141,7 +147,7 @@ def index_string_to_well_string( index_string, across_row_first, show_plate ):
     mobj = re.match( r'^([0-9]+)([-]([0-9]+))?$', item.strip() )
     if( mobj == None):
       print('Error: index_string_to_well_string: unable to parse index string', file=sys.stderr)
-      sys.exit(-1)
+      sys.exit(1)
     ipl, well = index_to_well(int( mobj.group( 1 ) ) - 1, across_row_first)
     if( ipl == 0 and not show_plate ):
       if( len( well_string ) > 0 ):
@@ -200,24 +206,24 @@ def make_index_string( index_list ):
 
 
 def write_sample_index_dict(sample_index_dict, prefix):
-  print( '%ssample name: %s' % (prefix, sample_index_dict['sample_id']))
-  print( '%sgenome: %s' % (prefix, sample_index_dict['genome']))
-  print( '%sprocess group: %s' % (prefix, sample_index_dict['process_group']))
-  print( '%slanes: %s' % (prefix, sample_index_dict['lanes']))
+  print( '%ssample name: %s' % (prefix, sample_index_dict['sample_id']), file=sys.stderr)
+  print( '%sgenome: %s' % (prefix, sample_index_dict['genome']), file=sys.stderr)
+  print( '%sprocess group: %s' % (prefix, sample_index_dict['process_group']), file=sys.stderr)
+  print( '%slanes: %s' % (prefix, sample_index_dict['lanes']), file=sys.stderr)
   (rt_indices, p7_indices, p5_indices) = sample_index_dict['ranges'].split(':')
-  print( '%srt wells: %s' % (prefix, index_string_to_well_string(rt_indices, True, True)))
-  print( '%sp7 wells: %s' % (prefix, index_string_to_well_string(p7_indices, True, True)))
-  print( '%sp5 wells: %s' % (prefix, index_string_to_well_string(p5_indices, False, True)))
+  print( '%srt wells: %s' % (prefix, index_string_to_well_string(rt_indices, True, True)), file=sys.stderr)
+  print( '%sp7 wells: %s' % (prefix, index_string_to_well_string(p7_indices, True, True)), file=sys.stderr)
+  print( '%sp5 wells: %s' % (prefix, index_string_to_well_string(p5_indices, False, True)), file=sys.stderr)
   if(len(sample_index_dict['hash_file']) != 0):
-    print( '%shash file: %s' % (prefix, sample_index_dict['hash_file']))
+    print( '%shash file: %s' % (prefix, sample_index_dict['hash_file']), file=sys.stderr)
   if(len(sample_index_dict['rt_file']) != 0):
-    print( '%srt file: %s' % (prefix, sample_index_dict['rt_file']))
+    print( '%srt file: %s' % (prefix, sample_index_dict['rt_file']), file=sys.stderr)
   if(len(sample_index_dict['p7_file']) != 0):
-    print( '%sp7 file: %s' % (prefix, sample_index_dict['p7_file']))
+    print( '%sp7 file: %s' % (prefix, sample_index_dict['p7_file']), file=sys.stderr)
   if(len(sample_index_dict['p5_file']) != 0):
-    print( '%sp5 file: %s' % (prefix, sample_index_dict['p5_file']))
+    print( '%sp5 file: %s' % (prefix, sample_index_dict['p5_file']), file=sys.stderr)
   if(len(sample_index_dict['ligation_file']) != 0):
-    print( '%sligation file: %s' % (prefix, sample_index_dict['ligation_file']))
+    print( '%sligation file: %s' % (prefix, sample_index_dict['ligation_file']), file=sys.stderr)
 
   return( 0 )
 
@@ -284,10 +290,10 @@ def check_for_duplicate_combinations(sample_index_list):
       for subdict in sample_index_subdict_lookup[dup_entry]:
         if(not subdict in dup_subdict_list):
           dup_subdict_list.append(subdict)
-    print('Error: duplicate combination of process_group, lanes, rt_indices, p7_indices, and p5_indices')
+    print('Error: duplicate combination of process_group, lanes, rt_indices, p7_indices, and p5_indices', file=sys.stderr)
     for subdict in dup_subdict_list:
       write_sample_index_dict(subdict, '  ')
-      print('  --')
+      print('  --', file=sys.stderr)
   return(error_flag)
 
 
@@ -305,12 +311,12 @@ def check_file_process_group(sample_index_list, file_type):
   for process_group in file_dict:
     if(len(file_dict[process_group]) > 1):
       error_flag = True
-      print('Error: more than one %s in process group \'%s\'' % (file_type, process_group))
+      print('Error: more than one %s in process group \'%s\'' % (file_type, process_group), file=sys.stderr)
       for file_name in file_dict[process_group]:
         if(len(file_name) > 0):
-          print('  %s' % (file_name))
+          print('  %s' % (file_name), file=sys.stderr)
         else:
-          print('  <empty string>')
+          print('  <empty string>', file=sys.stderr)
   return(error_flag)
 
 
@@ -330,17 +336,43 @@ def check_file_lanes(sample_index_list, file_type):
   for lane in file_dict:
     if(len(file_dict[lane]) > 1):
       error_flag = True
-      print('Error: more than one %s in lane \'%s\'' % (file_type, lane))
+      print('Error: more than one %s in lane \'%s\'' % (file_type, lane), file=sys.stderr)
       for file_name in file_dict[lane]:
         if(len(file_name) > 0):
-          print('  %s' % (file_name))
+          print('  %s' % (file_name), file=sys.stderr)
         else:
-          print('  <empty string>')
+          print('  <empty string>', file=sys.stderr)
+  return(error_flag)
+
+
+def check_for_file(file_path_str):
+  file_path = Path(file_path_str)
+  if(len(file_path_str) > 0 and file_path.is_file() == False):
+    return(1)
+  return(0)
+
+
+def check_files_exist(sample_index_list):
+  file_type_list = ['rt_file', 'ligation_file', 'p7_file', 'p5_file', 'hash_file']
+  missing_file_list = list()
+  for sample_index_dict in sample_index_list:
+    for file_type in file_type_list:
+      file_path = sample_index_dict[file_type]
+      if(check_for_file(file_path) == 0):
+        continue
+      missing_file_list.append((sample_index_dict['sample_id'],file_path))
+  error_flag = False
+  if(len(missing_file_list) > 0 ):
+    error_flag = True
+    missing_file_set = set(missing_file_list)
+    print('Error: unable to read files:', file=sys.stderr)
+    for missing_file in missing_file_set:
+      print('  %s for sample %s' % (missing_file[1], missing_file[0]), file=sys.stderr)
   return(error_flag)
 
 
 if __name__ == '__main__':
-  parser = argparse.ArgumentParser(description='A program to JSON samplesheet file.')
+  parser = argparse.ArgumentParser(description='A program to check JSON samplesheet file.')
   parser.add_argument('-i', '--input', required=True, default=None, help='Input JSON samplesheet filename (required string).')
   parser.add_argument('-v', '--version', action='version', version=program_version)
   args = parser.parse_args()
@@ -387,6 +419,10 @@ if __name__ == '__main__':
     exit_flag = 1
 
   error_flag = check_file_lanes(sample_index_list, 'p5_file')
+  if(error_flag):
+    exit_flag = 1
+
+  error_flag = check_files_exist(sample_index_list)
   if(error_flag):
     exit_flag = 1
 
